@@ -1,0 +1,33 @@
+@use "colors" as *;
+
+div {
+  position: fixed;
+  bottom: 2em;
+  right: 2em;
+  border-radius: 5em;
+  background-color: black;
+  min-width: 10em;
+  transform: translateX(150%);
+
+  &.active {
+    animation: slide-in 4.5s ease-in-out;
+  }
+
+  p {
+    padding: 1em 2em;
+    color: $accent-1;
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    transform: translateX(150%);
+  }
+  25%,
+  75% {
+    transform: translate(0);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}

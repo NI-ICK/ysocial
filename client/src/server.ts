@@ -7,6 +7,9 @@ import {
 import express from 'express'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import cookieParser from 'cookie-parser'
+import { environment } from './environments/environment.development'
+import cors from 'cors'
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url))
 const browserDistFolder = resolve(serverDistFolder, '../browser')
@@ -14,6 +17,13 @@ const browserDistFolder = resolve(serverDistFolder, '../browser')
 const app = express()
 const angularApp = new AngularNodeAppEngine()
 
+app.use(
+  cors({
+    origin: environment.BACKEND_URL,
+    credentials: true,
+  })
+)
+app.use(cookieParser())
 app.use(
   express.static(browserDistFolder, {
     maxAge: '1y',

@@ -1,0 +1,26 @@
+<form [formGroup]="registerForm" (ngSubmit)="handleFormSubmit()">
+  <h2>Sign Up</h2>
+  <div class="field">
+    <label for="">USERNAME</label>
+    <input type="text" formControlName="username" placeholder="Username" />
+  </div>
+  <print-error [control]="registerForm.get('username')"></print-error>
+  <div class="field">
+    <label for="">EMAIL</label>
+    <input type="text" formControlName="email" placeholder="E-mail" />
+  </div>
+  <print-error [control]="registerForm.get('email')"></print-error>
+  <password-field
+    label="PASSWORD"
+    placeholder="Password"
+    [formControl]="passwordControl"
+  ></password-field>
+  <print-error [control]="registerForm.get('password')"></print-error>
+  <password-field
+    label="REPEAT PASSWORD"
+    placeholder="Repeat Passowrd"
+    [formControl]="repeatPasswordControl"
+  ></password-field>
+  <print-error [control]="registerForm.get('repeatPassword')"></print-error>
+  <button type="submit">Sign Up</button>
+</form>

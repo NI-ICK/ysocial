@@ -1,0 +1,60 @@
+@use "_form-controls.scss";
+@use "colors" as *;
+
+.container {
+  background-color: white;
+  color: black;
+  margin-top: 1em;
+  padding: 0.5em 1em;
+  border-radius: 2em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  p {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+.separator {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+  margin-top: 1em;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    width: 35%;
+    height: 0.1em;
+    background-color: white;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  &::before {
+    left: 0.5em;
+  }
+
+  &::after {
+    right: 0.5em;
+  }
+}
+
+.message {
+  font-size: 0.8em;
+  align-self: center;
+
+  span {
+    cursor: pointer;
+    margin-left: 0.5ch;
+    font-weight: bold;
+    color: $accent-1;
+
+    &:hover {
+      color: $accent-2;
+    }
+  }
+}

@@ -1,0 +1,61 @@
+@use "colors" as *;
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5em 1em;
+  border-bottom: 0.1em solid darkgrey;
+  background-color: black;
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  a {
+    text-decoration: none;
+    font-size: 2em;
+
+    &:visited,
+    &:link {
+      color: white;
+    }
+  }
+
+  button {
+    cursor: pointer;
+    background-color: $accent-1;
+    outline: none;
+    border: none;
+    color: white;
+    padding: 0.5em 1em;
+    border-radius: 5em;
+
+    &:hover {
+      background-color: $accent-2;
+    }
+  }
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
+  overflow: hidden;
+  cursor: pointer;
+  border-radius: 100%;
+  outline: 0.15em solid darkgrey;
+
+  img {
+    height: 100%;
+    width: 100%;
+    border: none;
+    outline: none;
+    object-fit: cover;
+  }
+}

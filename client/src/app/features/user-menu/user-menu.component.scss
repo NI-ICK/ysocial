@@ -1,0 +1,20 @@
+@use "colors" as *;
+@use "sass:color";
+
+.content {
+  background-color: black;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  border: 0.1em solid darkgrey;
+
+  p {
+    cursor: pointer;
+    padding: 0.5em 1em;
+    font-size: 0.9em;
+
+    &:hover {
+      background-color: color.mix(black, white, 80%);
+      border-radius: 0.5em;
+    }
+  }
+}

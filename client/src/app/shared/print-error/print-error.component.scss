@@ -1,0 +1,10 @@
+@use "colors" as *;
+
+div {
+  margin-top: 0.5em;
+}
+
+p {
+  font-size: 0.8em;
+  color: $danger;
+}

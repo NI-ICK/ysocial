@@ -1,0 +1,55 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: String!
+  username: String!
+  email: String!
+  password: String
+  provider: AuthProvider!
+  providerId: String
+  imagePath: String
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+  GITHUB
+}
+
+type LoginUserResponse {
+  access_token: String!
+}
+
+type RegisterUserOutput {
+  id: String!
+  username: String!
+  email: String!
+}
+
+type LogoutUserOutput {
+  success: Boolean!
+}
+
+type Query {
+  getCurrentUser: User!
+  getAllUsers: [User!]!
+}
+
+type Mutation {
+  loginUser(loginUserData: LoginUserInput!): LoginUserResponse!
+  logoutUser: LogoutUserOutput!
+  registerUser(registerUserData: RegisterUserInput!): RegisterUserOutput!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input RegisterUserInput {
+  username: String!
+  email: String!
+  password: String!
+}

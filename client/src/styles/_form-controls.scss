@@ -1,0 +1,53 @@
+@use "colors" as *;
+
+form {
+  display: grid;
+  background-color: black;
+  border-radius: 1em;
+  padding: 1.5em;
+  box-shadow: -0.5em 0.5em 1em -0.2em black;
+  width: 25em;
+
+  h2 {
+    text-align: center;
+  }
+
+  button {
+    margin-top: 2em;
+    margin-bottom: 1em;
+    font-weight: bold;
+    padding: 0.5em 1.5em;
+    border-radius: 0.5em;
+    border: none;
+    background-color: $accent-1;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $accent-2;
+    }
+  }
+}
+
+.field {
+  display: grid;
+  padding-top: 1em;
+
+  label {
+    margin-bottom: 0.5em;
+    font-size: 0.9em;
+  }
+
+  input {
+    width: 100%;
+    background-color: $background-2;
+    border: 0.15em solid transparent;
+    outline: transparent;
+    border-radius: 0.5em;
+    color: white;
+    padding: 0.5em 1em;
+
+    &:focus {
+      border-color: $accent-1;
+    }
+  }
+}

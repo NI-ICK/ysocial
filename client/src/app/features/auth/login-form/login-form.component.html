@@ -1,0 +1,33 @@
+<form [formGroup]="loginForm" (ngSubmit)="handleFormSubmit()">
+  <h2>Sign In</h2>
+  <div class="container" (click)="handleGoogleLogin()">
+    <google-icon></google-icon>
+    <p>Continue with Google</p>
+  </div>
+  <div class="container" (click)="handleGithubLogin()">
+    <github-icon></github-icon>
+    <p>Continue with Github</p>
+  </div>
+  <span class="separator">OR</span>
+  <div class="field">
+    <label for="email-field">EMAIL</label>
+    <input
+      type="text"
+      formControlName="email"
+      placeholder="E-mail"
+      id="email-field"
+    />
+  </div>
+  <print-error [control]="loginForm.get('email')"></print-error>
+  <password-field
+    [formControl]="passwordControl"
+    label="PASSWORD"
+    placeholder="Password"
+  ></password-field>
+  <print-error [control]="loginForm.get('password')"></print-error>
+  <button type="submit">Sign In</button>
+  <p class="message">
+    Don't have an account?
+    <span (click)="openRegisterModal.emit()">Sign Up</span>
+  </p>
+</form>

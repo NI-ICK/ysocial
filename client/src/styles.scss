@@ -1,1 +1,27 @@
+@use "colors" as *;
 
+@font-face {
+  font-family: "Poppins-Medium";
+  src: url("/fonts/Poppins-Medium.ttf") format("truetype");
+}
+
+body {
+  background-color: $background-1;
+  color: white;
+  font-family: "Poppins-Medium", "Courier New", Courier, monospace;
+}
+
+*,
+*::after,
+*::before {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

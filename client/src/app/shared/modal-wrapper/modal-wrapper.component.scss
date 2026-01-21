@@ -1,0 +1,20 @@
+.backdrop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  inset: 0;
+  background-color: rgba(black, 0.3);
+
+  &.side {
+    align-items: start;
+    justify-content: end;
+    margin: 3.5em 1em;
+  }
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
