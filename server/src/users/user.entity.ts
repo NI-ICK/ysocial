@@ -1,6 +1,7 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
+import { Post } from 'src/posts/post.entity'
 import { AuthProvider } from 'src/utils/auth-provider.enum'
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
 
 registerEnumType(AuthProvider, { name: 'AuthProvider' })
 
@@ -34,4 +35,8 @@ export class User {
   @Column({ nullable: true })
   @Field({ nullable: true })
   imagePath?: string
+
+  @Field(() => [Post])
+  @OneToMany(() => Post, (post) => post.user, { cascade: true })
+  posts: Post[] = []
 }
