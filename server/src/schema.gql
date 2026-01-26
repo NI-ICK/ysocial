@@ -2,6 +2,15 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Post {
+  id: String!
+  title: String!
+  body: String!
+  image: String
+  imagePublicId: String
+  user: User!
+}
+
 type User {
   id: String!
   username: String!
@@ -10,6 +19,7 @@ type User {
   provider: AuthProvider!
   providerId: String
   imagePath: String
+  posts: [Post!]
 }
 
 enum AuthProvider {
@@ -32,15 +42,24 @@ type LogoutUserOutput {
   success: Boolean!
 }
 
+type DeletePostOutput {
+  success: Boolean!
+  message: String!
+}
+
 type Query {
   getCurrentUser: User!
   getAllUsers: [User!]!
+  getPost(id: String!): Post!
 }
 
 type Mutation {
   loginUser(loginUserData: LoginUserInput!): LoginUserResponse!
   logoutUser: LogoutUserOutput!
   registerUser(registerUserData: RegisterUserInput!): RegisterUserOutput!
+  createPost(createPostData: CreatePostInput!): Post!
+  editPost(editPostData: EditPostInput!): Post!
+  deletePost(id: String!): DeletePostOutput!
 }
 
 input LoginUserInput {
@@ -52,4 +71,24 @@ input RegisterUserInput {
   username: String!
   email: String!
   password: String!
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  image: FileDataModel
+  userId: String!
+}
+
+input FileDataModel {
+  file: Upload!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
+input EditPostInput {
+  id: String!
+  title: String
+  body: String
 }

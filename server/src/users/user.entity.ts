@@ -36,7 +36,7 @@ export class User {
   @Field({ nullable: true })
   imagePath?: string
 
-  @Field(() => [Post])
   @OneToMany(() => Post, (post) => post.user, { cascade: true })
-  posts: Post[] = []
+  @Field(() => [Post], { nullable: true })
+  posts?: Post[]
 }

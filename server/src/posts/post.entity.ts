@@ -1,6 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql'
 import { User } from 'src/users/user.entity'
-import { Entity, ManyToOne, PrimaryColumn } from 'typeorm'
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm'
 
 @Entity()
 @ObjectType()
@@ -9,16 +9,23 @@ export class Post {
   @Field()
   id: string
 
+  @Column()
   @Field()
   title: string
 
+  @Column()
   @Field()
   body: string
 
-  @Field()
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   image?: string
 
-  @Field(() => User)
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  imagePublicId?: string
+
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
+  @Field(() => User)
   user: User
 }

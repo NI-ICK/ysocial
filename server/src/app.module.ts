@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
 import { UsersModule } from './users/users.module'
 import { GraphQLModule } from '@nestjs/graphql'
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo'
@@ -6,7 +6,9 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { User } from './users/user.entity'
 import { ConfigModule } from '@nestjs/config'
 import { AuthModule } from './auth/auth.module'
-import { PostsService } from './posts/posts.service'
+import { CloudinaryModule } from './cloudinary/cloudinary.module'
+import { graphqlUploadExpress } from 'graphql-upload-ts'
+import { Post } from './posts/post.entity'
 import { PostsModule } from './posts/posts.module'
 
 @Module({
@@ -27,14 +29,26 @@ import { PostsModule } from './posts/posts.module'
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [User],
+      entities: [User, Post],
       synchronize: process.env.TYPEORM_SYNC as boolean | undefined,
     }),
     AuthModule,
     UsersModule,
     PostsModule,
+    CloudinaryModule,
   ],
   controllers: [],
-  providers: [PostsService],
+  providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        graphqlUploadExpress({
+          maxFileSize: 1024 * 1024 * 10, // 10MB
+          maxFiles: 1,
+        }),
+      )
+      .forRoutes('graphql')
+  }
+}
