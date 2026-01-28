@@ -4,8 +4,8 @@
 
 type Post {
   id: String!
-  title: String!
-  body: String!
+  title: String
+  body: String
   image: String
   imagePublicId: String
   user: User!
@@ -50,7 +50,8 @@ type DeletePostOutput {
 type Query {
   getCurrentUser: User!
   getAllUsers: [User!]!
-  getPost(id: String!): Post!
+  getPostById(id: String!): Post!
+  getAllPosts: [Post!]!
 }
 
 type Mutation {
@@ -74,14 +75,10 @@ input RegisterUserInput {
 }
 
 input CreatePostInput {
-  title: String!
-  body: String!
-  image: FileDataModel
+  title: String
+  body: String
+  image: Upload
   userId: String!
-}
-
-input FileDataModel {
-  file: Upload!
 }
 
 """The `Upload` scalar type represents a file upload."""

@@ -7,7 +7,7 @@ import { UsersService } from 'src/users/users.service'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 import { FileUpload } from 'graphql-upload-ts'
 import { CreatePostInput } from '../dtos/create-post.input'
-import { NotFoundException } from '@nestjs/common'
+import { BadRequestException, NotFoundException } from '@nestjs/common'
 
 describe('PostsService', () => {
   let postsService: PostsService
@@ -69,11 +69,9 @@ describe('PostsService', () => {
         body: 'test',
         title: 'test',
         userId: '1',
-        image: {
-          file: Promise.resolve({
-            createReadStream: jest.fn(),
-          } as Partial<FileUpload>),
-        },
+        image: Promise.resolve({
+          createReadStream: jest.fn(),
+        } as Partial<FileUpload>),
       }
       const mockPost = {
         id: '1',
@@ -99,6 +97,12 @@ describe('PostsService', () => {
       expect(postsRepository.save).toHaveBeenCalled()
       expect(result.image).toEqual('testPath')
       expect(result.imagePublicId).toEqual('123')
+    })
+
+    it('should throw BadRequestException if body and image are missing', async () => {
+      await expect(postsService.createPost({ userId: '1' })).rejects.toThrow(
+        BadRequestException,
+      )
     })
 
     it('should throw NotFoundException if user is not found', async () => {

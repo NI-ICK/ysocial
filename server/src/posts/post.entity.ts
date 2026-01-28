@@ -9,13 +9,13 @@ export class Post {
   @Field()
   id: string
 
-  @Column()
-  @Field()
-  title: string
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  title?: string
 
-  @Column()
-  @Field()
-  body: string
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  body?: string
 
   @Column({ nullable: true })
   @Field({ nullable: true })

@@ -1,16 +1,16 @@
 import { Field, InputType } from '@nestjs/graphql'
-import { FileDataModel } from 'src/utils/file-data.model'
+import { FileUpload, GraphQLUpload } from 'graphql-upload-ts'
 
 @InputType()
 export class CreatePostInput {
-  @Field()
-  title: string
-
-  @Field()
-  body: string
+  @Field({ nullable: true })
+  title?: string
 
   @Field({ nullable: true })
-  image?: FileDataModel
+  body?: string
+
+  @Field(() => GraphQLUpload, { nullable: true })
+  image?: Promise<FileUpload>
 
   @Field()
   userId: string

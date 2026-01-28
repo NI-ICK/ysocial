@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Post } from './post.entity'
 import { Repository } from 'typeorm'
@@ -19,10 +23,14 @@ export class PostsService {
   async createPost(data: CreatePostInput) {
     const { title, body, image, userId } = data
 
+    if (!body?.trim() && !(await image)) {
+      throw new BadRequestException('Post must have a body or an image')
+    }
+
     let imageUrl = ''
     let imageId = ''
     if (image) {
-      const file = await image.file
+      const file = await image
       const upload = await this.cloudinaryService.uploadFile(
         file,
         'ysocial/posts',
