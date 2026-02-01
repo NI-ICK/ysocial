@@ -8,10 +8,7 @@ import {
   ApolloTestingModule,
 } from 'apollo-angular/testing'
 import { AuthState } from '../../../utils/auth-state.enum'
-import {
-  GET_CURRENT_USER,
-  LOGOUT_USER,
-} from '../../../graphql/graphql.operations'
+import { GET_CURRENT_USER, LOGOUT_USER } from '../../../graphql/auth.operations'
 
 jest.mock('@angular/common', () => ({
   ...jest.requireActual('@angular/common'),

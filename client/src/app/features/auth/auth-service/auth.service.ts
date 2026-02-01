@@ -2,10 +2,7 @@ import { isPlatformBrowser } from '@angular/common'
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core'
 import { Apollo } from 'apollo-angular'
 import { BehaviorSubject } from 'rxjs'
-import {
-  GET_CURRENT_USER,
-  LOGOUT_USER,
-} from '../../../graphql/graphql.operations'
+import { GET_CURRENT_USER, LOGOUT_USER } from '../../../graphql/auth.operations'
 import { AuthState } from '../../../utils/auth-state.enum'
 import { User } from '../../../utils/user.interface'
 

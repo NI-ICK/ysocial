@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms'
 import { Apollo } from 'apollo-angular'
-import { REGISTER_USER } from '../../../graphql/graphql.operations'
+import { REGISTER_USER } from '../../../graphql/auth.operations'
 import { PasswordFieldComponent } from '../../../shared/password-field/password-field.component'
 import { PrintErrorComponent } from '../../../shared/print-error/print-error.component'
 import { PopupService } from '../../../shared/popup/popup.service'

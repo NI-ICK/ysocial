@@ -1,10 +1,5 @@
-import {
-  ApplicationConfig,
-  provideZoneChangeDetection,
-  inject,
-} from '@angular/core'
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core'
 import { provideRouter } from '@angular/router'
-
 import { routes } from './app.routes'
 import {
   provideClientHydration,
@@ -12,8 +7,8 @@ import {
 } from '@angular/platform-browser'
 import { provideHttpClient } from '@angular/common/http'
 import { provideApollo } from 'apollo-angular'
-import { HttpLink } from 'apollo-angular/http'
 import { InMemoryCache } from '@apollo/client'
+import UploadHttpLink from 'apollo-upload-client/UploadHttpLink.mjs'
 import { environment } from '../environments/environment.development'
 
 export const appConfig: ApplicationConfig = {
@@ -22,16 +17,13 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(),
-    provideApollo(() => {
-      const httpLink = inject(HttpLink)
-
-      return {
-        link: httpLink.create({
-          uri: environment.GRAPHQL_URL,
-          withCredentials: true,
-        }),
-        cache: new InMemoryCache(),
-      }
-    }),
+    provideApollo(() => ({
+      link: new UploadHttpLink({
+        uri: environment.GRAPHQL_URL,
+        credentials: 'include',
+        headers: { 'Apollo-Require-Preflight': 'true' },
+      }),
+      cache: new InMemoryCache(),
+    })),
   ],
 }

@@ -1,0 +1,46 @@
+<div *ngIf="currentUser$ | async as currentUser" class="container">
+  <div class="content">
+    <div class="profile">
+      <img [src]="currentUser.imagePath" default="profile" />
+    </div>
+    <form [formGroup]="createPostForm" (ngSubmit)="handleFormSubmit()">
+      <div class="field">
+        <input
+          type="text"
+          formControlName="title"
+          placeholder="Title (Optional)"
+        />
+      </div>
+      <div class="field">
+        <textarea formControlName="body" placeholder="Body"></textarea>
+      </div>
+      <input
+        #fileInput
+        type="file"
+        (change)="handleFileInputChange($event)"
+        style="display: none"
+      />
+      <div class="wrapper">
+        <span
+          class="icon"
+          (click)="handleChooseFile()"
+          (mouseenter)="imageIconHovered = true"
+          (mouseleave)="imageIconHovered = false"
+        >
+          <image-icon
+            [color]="imageIconHovered ? '#6d3bf7' : '#a78afa'"
+          ></image-icon>
+        </span>
+        <span
+          *ngIf="selectedFile"
+          class="remove"
+          (click)="handleRemoveFile()"
+        ></span>
+        <button type="submit">Post</button>
+      </div>
+    </form>
+  </div>
+  <div *ngIf="selectedFile" class="preview">
+    <img [src]="imagePreview" />
+  </div>
+</div>

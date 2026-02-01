@@ -5,7 +5,7 @@
   <ng-container *ngIf="authState$ | async as state">
     <ng-container *ngIf="currentUser$ | async as currentUser">
       <div class="profile" (click)="openMenu()" *ngIf="currentUser.imagePath">
-        <img [src]="currentUser.imagePath" [default]="DEFAULT_PROFILE_IMG" />
+        <img [src]="currentUser.imagePath" default="profile" />
       </div>
     </ng-container>
     <div *ngIf="state === AuthState.UNAUTHENTICATED">
@@ -13,6 +13,7 @@
     </div>
   </ng-container>
 </nav>
+<div class="margin"></div>
 
 <modal-wrapper *ngIf="showLoginModal" (close)="closeLoginModal()">
   <login-form

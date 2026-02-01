@@ -50,4 +50,19 @@ form {
       border-color: $accent-1;
     }
   }
+
+  textarea {
+    width: 100%;
+    background-color: $background-2;
+    border: 0.15em solid transparent;
+    outline: transparent;
+    border-radius: 0.5em;
+    color: white;
+    padding: 0.5em 1em;
+    font-size: 0.8em;
+
+    &:focus {
+      border-color: $accent-1;
+    }
+  }
 }

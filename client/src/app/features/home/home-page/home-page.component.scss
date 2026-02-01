@@ -1,0 +1,17 @@
+@use "colors" as *;
+
+.container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 4em); // Navbar
+}
+
+.home {
+  width: 40em;
+  min-height: 100%;
+  background-color: black;
+  border-left: 0.1em solid $border;
+  border-right: 0.1em solid $border;
+}

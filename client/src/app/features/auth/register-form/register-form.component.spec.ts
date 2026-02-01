@@ -4,7 +4,7 @@ import {
   ApolloTestingController,
   ApolloTestingModule,
 } from 'apollo-angular/testing'
-import { REGISTER_USER } from '../../../graphql/graphql.operations'
+import { REGISTER_USER } from '../../../graphql/auth.operations'
 import { FormBuilder, Validators } from '@angular/forms'
 
 describe('RegisterFormComponent', () => {

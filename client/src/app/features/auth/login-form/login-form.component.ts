@@ -6,7 +6,7 @@ import {
   Validators,
 } from '@angular/forms'
 import { Apollo } from 'apollo-angular'
-import { LOGIN_USER } from '../../../graphql/graphql.operations'
+import { LOGIN_USER } from '../../../graphql/auth.operations'
 import { GoogleIconComponent } from '../../../shared/icons/google-icon/google-icon.component'
 import { PasswordFieldComponent } from '../../../shared/password-field/password-field.component'
 import { GithubIconComponent } from '../../../shared/icons/github-icon/github-icon.component'

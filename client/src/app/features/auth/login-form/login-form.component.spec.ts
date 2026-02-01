@@ -4,7 +4,7 @@ import {
   ApolloTestingController,
   ApolloTestingModule,
 } from 'apollo-angular/testing'
-import { LOGIN_USER } from '../../../graphql/graphql.operations'
+import { LOGIN_USER } from '../../../graphql/auth.operations'
 import { AuthService } from '../auth-service/auth.service'
 import { By } from '@angular/platform-browser'
 
