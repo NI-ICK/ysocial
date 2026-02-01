@@ -6,10 +6,26 @@ import { DeletePostOutput } from './dtos/delete-post.output'
 import { EditPostInput } from './dtos/edit-post.input'
 import { UseGuards } from '@nestjs/common'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard'
+import { Parent, ResolveField } from '@nestjs/graphql'
+import { User } from 'src/users/user.entity'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
-@Resolver()
+@Resolver(() => Post)
 export class PostsResolver {
-  constructor(private postsService: PostsService) {}
+  constructor(
+    private postsService: PostsService,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
+  ) {}
+
+  @ResolveField(() => User)
+  user(@Parent() post: Post) {
+    return this.postsRepository
+      .createQueryBuilder()
+      .relation(Post, 'user')
+      .of(post)
+      .loadOne()
+  }
 
   @UseGuards(JwtAuthGuard)
   @Mutation((_return) => Post)
