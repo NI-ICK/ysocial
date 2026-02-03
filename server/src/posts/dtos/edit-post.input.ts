@@ -5,9 +5,6 @@ export class EditPostInput {
   @Field()
   id: string
 
-  @Field({ nullable: true })
-  title?: string
-
-  @Field({ nullable: true })
-  body?: string
+  @Field()
+  body: string
 }

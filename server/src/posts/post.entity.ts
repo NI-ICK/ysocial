@@ -11,10 +11,6 @@ export class Post {
 
   @Column({ nullable: true })
   @Field({ nullable: true })
-  title?: string
-
-  @Column({ nullable: true })
-  @Field({ nullable: true })
   body?: string
 
   @Column({ nullable: true })

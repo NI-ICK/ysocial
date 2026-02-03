@@ -21,7 +21,7 @@ export class PostsService {
   ) {}
 
   async createPost(data: CreatePostInput) {
-    const { title, body, image, userId } = data
+    const { body, image, userId } = data
 
     if (!body?.trim() && !(await image)) {
       throw new BadRequestException('Post must have a body or an image')
@@ -44,11 +44,10 @@ export class PostsService {
 
     const newPost = this.postsRepository.create({
       id: randomUUID(),
-      title,
       body,
       image: imageUrl,
-      user,
       imagePublicId: imageId,
+      user,
     })
     await this.postsRepository.save(newPost)
 
@@ -59,8 +58,7 @@ export class PostsService {
     const post = await this.postsRepository.findOne({ where: { id: data.id } })
     if (!post) throw new NotFoundException('Post not found')
 
-    if (data.title !== undefined) post.title = data.title
-    if (data.body !== undefined) post.body = data.body
+    post.body = data.body
 
     return await this.postsRepository.save(post)
   }

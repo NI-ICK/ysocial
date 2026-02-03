@@ -4,7 +4,6 @@
 
 type Post {
   id: String!
-  title: String
   body: String
   image: String
   imagePublicId: String
@@ -75,7 +74,6 @@ input RegisterUserInput {
 }
 
 input CreatePostInput {
-  title: String
   body: String
   image: Upload
   userId: String!
@@ -86,6 +84,5 @@ scalar Upload
 
 input EditPostInput {
   id: String!
-  title: String
-  body: String
+  body: String!
 }

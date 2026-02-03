@@ -49,8 +49,8 @@ describe('PostsService', () => {
 
   describe('createPost', () => {
     it('should create post without image', async () => {
-      const input = { body: 'test', title: 'test', userId: '1' }
-      const mockPost = { id: '1', body: 'test', title: 'test', image: '' }
+      const input = { body: 'test', userId: '1' }
+      const mockPost = { id: '1', body: 'test', image: '' }
 
       ;(usersService.getUserBy as jest.Mock).mockResolvedValue({ id: '1' })
       ;(postsRepository.create as jest.Mock).mockResolvedValue(mockPost)
@@ -67,7 +67,6 @@ describe('PostsService', () => {
     it('should create post with image', async () => {
       const input = {
         body: 'test',
-        title: 'test',
         userId: '1',
         image: Promise.resolve({
           createReadStream: jest.fn(),
@@ -76,7 +75,6 @@ describe('PostsService', () => {
       const mockPost = {
         id: '1',
         body: 'test',
-        title: 'test',
         image: 'testPath',
         imagePublicId: '123',
       }
@@ -109,14 +107,14 @@ describe('PostsService', () => {
       ;(usersService.getUserBy as jest.Mock).mockResolvedValue(null)
 
       await expect(
-        postsService.createPost({ body: 'test', title: 'test', userId: '1' }),
+        postsService.createPost({ body: 'test', userId: '1' }),
       ).rejects.toThrow(NotFoundException)
     })
   })
 
   describe('editPost', () => {
     it('should edit a post', async () => {
-      const mockPost = { body: 'test', title: 'test' }
+      const mockPost = { body: 'test' }
 
       ;(postsRepository.findOne as jest.Mock).mockResolvedValue(mockPost)
       ;(postsRepository.save as jest.Mock).mockResolvedValue({
@@ -127,7 +125,6 @@ describe('PostsService', () => {
       const result = await postsService.editPost({ body: 'new', id: '1' })
 
       expect(result.body).toEqual('new')
-      expect(result.title).toEqual('test')
     })
 
     it('should throw NotFoundException if post not found', async () => {

@@ -4,9 +4,6 @@ import { FileUpload, GraphQLUpload } from 'graphql-upload-ts'
 @InputType()
 export class CreatePostInput {
   @Field({ nullable: true })
-  title?: string
-
-  @Field({ nullable: true })
   body?: string
 
   @Field(() => GraphQLUpload, { nullable: true })

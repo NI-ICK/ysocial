@@ -2,10 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { PostsResolver } from '../posts.resolver'
 import { PostsService } from '../posts.service'
 import { Post } from '../post.entity'
+import { getRepositoryToken } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 describe('PostsResolver', () => {
   let resolver: PostsResolver
   let service: Partial<PostsService>
+  let postsRepository: Partial<Repository<Post>>
 
   beforeEach(async () => {
     service = {
@@ -17,7 +20,11 @@ describe('PostsResolver', () => {
     }
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [PostsResolver, { provide: PostsService, useValue: service }],
+      providers: [
+        PostsResolver,
+        { provide: PostsService, useValue: service },
+        { provide: getRepositoryToken(Post), useValue: postsRepository },
+      ],
     }).compile()
 
     resolver = module.get<PostsResolver>(PostsResolver)
@@ -29,7 +36,7 @@ describe('PostsResolver', () => {
 
   describe('createPost', () => {
     it('should call postsService.createPost and return the result', async () => {
-      const input = { body: 'test', title: 'test', userId: '1' }
+      const input = { body: 'test', userId: '1' }
       const mockPost = { id: '1', ...input }
 
       ;(service.createPost as jest.Mock).mockResolvedValue(mockPost)
