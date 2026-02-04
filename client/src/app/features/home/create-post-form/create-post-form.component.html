@@ -5,14 +5,11 @@
     </div>
     <form [formGroup]="createPostForm" (ngSubmit)="handleFormSubmit()">
       <div class="field">
-        <input
-          type="text"
-          formControlName="title"
-          placeholder="Title (Optional)"
-        />
-      </div>
-      <div class="field">
-        <textarea formControlName="body" placeholder="Body"></textarea>
+        <textarea
+          #textarea
+          formControlName="body"
+          placeholder="Say something"
+        ></textarea>
       </div>
       <input
         #fileInput

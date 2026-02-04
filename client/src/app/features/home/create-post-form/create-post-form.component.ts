@@ -26,14 +26,28 @@ export class CreatePostFormComponent implements OnInit {
   currentUser$!: Observable<User | null>
   fb = new FormBuilder()
   imageIconHovered = false
-  @ViewChild('fileInput') fileInput!: ElementRef
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>
   selectedFile: File | null = null
   imagePreview = ''
 
   createPostForm = this.fb.group({
-    title: [''],
     body: [''],
   })
+
+  @ViewChild('textarea')
+  set textarea(el: ElementRef<HTMLTextAreaElement> | undefined) {
+    if (!el) return
+
+    const textarea = el.nativeElement
+
+    const resize = () => {
+      textarea.style.height = 'auto'
+      textarea.style.height = textarea.scrollHeight + 'px'
+    }
+
+    resize()
+    textarea.addEventListener('input', resize)
+  }
 
   constructor(
     private authService: AuthService,
@@ -77,7 +91,6 @@ export class CreatePostFormComponent implements OnInit {
           mutation: CREATE_POST,
           variables: {
             userId: currentUser.id,
-            title: this.createPostForm.get('title')?.value || null,
             body: this.createPostForm.get('body')?.value || null,
             ...(this.selectedFile && { image: this.selectedFile }),
           },
