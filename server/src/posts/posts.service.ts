@@ -68,7 +68,7 @@ export class PostsService {
   }
 
   getAllPosts() {
-    return this.postsRepository.find()
+    return this.postsRepository.find({ order: { createdAt: 'DESC' } })
   }
 
   async deletePost(id: string) {
