@@ -5,6 +5,7 @@ div {
   bottom: 2em;
   right: 2em;
   border-radius: 5em;
+  border: 0.1em solid $border;
   background-color: black;
   min-width: 10em;
   transform: translateX(150%);

@@ -5,10 +5,9 @@ import { AuthService } from '../../auth/auth-service/auth.service'
 import { ImageIconComponent } from '../../../shared/icons/image-icon/image-icon.component'
 import { ImagePreloadDirective } from '../../../shared/directives/image-preload/image-preload.directive'
 import { CommonModule, NgIf } from '@angular/common'
-import { Observable, take } from 'rxjs'
-import { Apollo } from 'apollo-angular'
-import { CREATE_POST } from '../../../graphql/post.operations'
-import { PopupService } from '../../../shared/popup/popup.service'
+import { Observable } from 'rxjs'
+import { Store } from '@ngrx/store'
+import { createPost } from '../../../store/posts/posts.actions'
 
 @Component({
   selector: 'create-post-form',
@@ -49,11 +48,7 @@ export class CreatePostFormComponent implements OnInit {
     textarea.addEventListener('input', resize)
   }
 
-  constructor(
-    private authService: AuthService,
-    private apollo: Apollo,
-    private popupService: PopupService
-  ) {}
+  constructor(private authService: AuthService, private store: Store) {}
 
   ngOnInit() {
     this.currentUser$ = this.authService.getCurrentUser()
@@ -81,25 +76,13 @@ export class CreatePostFormComponent implements OnInit {
   }
 
   handleFormSubmit() {
-    if (!this.createPostForm.get('body')?.value && !this.selectedFile) return
+    const body = this.createPostForm.get('body')?.value
 
-    this.currentUser$.pipe(take(1)).subscribe((currentUser) => {
-      if (!currentUser) return
+    if (!body && !this.selectedFile) return
 
-      this.apollo
-        .mutate({
-          mutation: CREATE_POST,
-          variables: {
-            userId: currentUser.id,
-            body: this.createPostForm.get('body')?.value || null,
-            ...(this.selectedFile && { image: this.selectedFile }),
-          },
-        })
-        .subscribe({
-          next: () => this.popupService.showPopup('Post created'),
-          error: (err) => console.log('Error: ', err),
-        })
-    })
+    this.store.dispatch(
+      createPost({ body: body || null, file: this.selectedFile })
+    )
 
     this.createPostForm.reset()
     this.handleRemoveFile()

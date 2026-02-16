@@ -1,0 +1,76 @@
+@use "colors" as *;
+
+.post {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  gap: 1em;
+  padding: 1em;
+  border-bottom: 0.1em solid $border;
+  cursor: pointer;
+
+  .profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5em;
+    height: 2.5em;
+    overflow: hidden;
+    border-radius: 100%;
+    outline: 0.15em solid $border;
+
+    img {
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      object-fit: cover;
+    }
+  }
+
+  .content {
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5em;
+    flex: 1;
+
+    p {
+      font-family: "Poppins-Light", "Courier New", Courier, monospace;
+      font-size: 0.9em;
+    }
+
+    a {
+      position: relative;
+      text-decoration: none;
+      font-weight: bold;
+
+      &:visited,
+      &:link {
+        color: $accent-1;
+      }
+
+      &:hover {
+        color: $accent-2;
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 0.1em;
+          background-color: $accent-2;
+        }
+      }
+    }
+
+    img {
+      border-radius: 0.5em;
+      max-width: 100%;
+      max-height: 30em;
+    }
+  }
+}

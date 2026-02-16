@@ -1,10 +1,13 @@
-import { User } from './user.interface'
-
 export interface Post {
   id: string
-  title?: string
-  body?: string
-  image?: string
-  imagePublicId?: string
-  user: User
+  body: string | null
+  image: string | null
+  imagePublicId: string | null
+  createdAt: Date
+  updatedAt: Date
+  user: {
+    id: string
+    username: string
+    imagePath: string
+  }
 }

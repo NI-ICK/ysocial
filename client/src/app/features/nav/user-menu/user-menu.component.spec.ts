@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-
 import { UserMenuComponent } from './user-menu.component'
-import { AuthService } from '../auth/auth-service/auth.service'
+import { AuthService } from '../../auth/auth-service/auth.service'
 import { By } from '@angular/platform-browser'
 
 describe('UserMenuComponent', () => {

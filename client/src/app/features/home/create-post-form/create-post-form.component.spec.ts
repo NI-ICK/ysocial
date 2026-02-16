@@ -2,31 +2,29 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { CreatePostFormComponent } from './create-post-form.component'
 import { AuthService } from '../../auth/auth-service/auth.service'
 import { of } from 'rxjs'
-import { Apollo } from 'apollo-angular'
-import { Readable } from 'stream'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { createPost } from '../../../store/posts/posts.actions'
 
 describe('CreatePostFormComponent', () => {
   let component: CreatePostFormComponent
   let fixture: ComponentFixture<CreatePostFormComponent>
   let authService: Partial<AuthService>
-  let apolloMock: Partial<Apollo>
+  let store: MockStore
 
   beforeEach(async () => {
     authService = {
       getCurrentUser: jest.fn().mockReturnValue(of({ id: '1' })),
     }
-    apolloMock = {
-      mutate: jest.fn(),
-    }
 
     await TestBed.configureTestingModule({
       imports: [CreatePostFormComponent],
       providers: [
+        provideMockStore(),
         { provide: AuthService, useValue: authService },
-        { provide: Apollo, useValue: apolloMock },
       ],
     }).compileComponents()
 
+    store = TestBed.inject(MockStore)
     fixture = TestBed.createComponent(CreatePostFormComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
@@ -90,25 +88,30 @@ describe('CreatePostFormComponent', () => {
     expect(component.imagePreview).toBe('preview-data')
   })
 
-  it('should not call apollo.mutate if body and selectedFile are empty', () => {
+  it('should not call dispatch if body and selectedFile are empty', () => {
     component.createPostForm.get('body')?.setValue('')
     component.selectedFile = null
+    const dispatchSpy = jest.spyOn(store, 'dispatch')
 
     component.handleFormSubmit()
 
-    expect(apolloMock.mutate).not.toHaveBeenCalled()
+    expect(dispatchSpy).not.toHaveBeenCalled()
   })
 
-  it('should call apollo.mutate if form is valid and reset form data', () => {
+  it('should call dispatch if form is valid and reset form data', () => {
+    const mockFile = new File(['content'], '')
     component.createPostForm.get('body')?.setValue('test')
-    component.selectedFile = new File(['content'], '')
+    component.selectedFile = mockFile
+    const dispatchSpy = jest.spyOn(store, 'dispatch')
 
     const removeFileSpy = jest.spyOn(component, 'handleRemoveFile')
     const formResetSpy = jest.spyOn(component.createPostForm, 'reset')
 
     component.handleFormSubmit()
 
-    expect(apolloMock.mutate).toHaveBeenCalled()
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      createPost({ body: 'test', file: mockFile })
+    )
     expect(removeFileSpy).toHaveBeenCalled()
     expect(formResetSpy).toHaveBeenCalled()
   })

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Output } from '@angular/core'
-import { AuthService } from '../auth/auth-service/auth.service'
+import { AuthService } from '../../auth/auth-service/auth.service'
 
 @Component({
   selector: 'user-menu',

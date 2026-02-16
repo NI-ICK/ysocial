@@ -8,6 +8,30 @@ export const CREATE_POST = gql`
       id
       body
       image
+      createdAt
+      updatedAt
+      user {
+        id
+        username
+        imagePath
+      }
+    }
+  }
+`
+
+export const GET_ALL_POSTS = gql`
+  query {
+    getAllPosts {
+      id
+      body
+      image
+      createdAt
+      updatedAt
+      user {
+        id
+        username
+        imagePath
+      }
     }
   }
 `

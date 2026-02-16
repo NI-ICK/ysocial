@@ -1,0 +1,20 @@
+<div>
+  <div
+    class="post"
+    *ngFor="let post of posts"
+    [routerLink]="['/', post.user.username, post.id]"
+  >
+    <div class="profile">
+      <img [src]="post.user.imagePath" default="profile" />
+    </div>
+    <div class="content">
+      <a
+        [routerLink]="['/', post.user.username]"
+        (click)="$event.stopPropagation()"
+        >{{ post.user.username }}</a
+      >
+      <p *ngIf="post.body">{{ post.body }}</p>
+      <img *ngIf="post.image" [src]="post.image" default="post" />
+    </div>
+  </div>
+</div>
