@@ -25,3 +25,11 @@ export const createPostFailure = createAction(
   '[Posts] Create Post Failure',
   props<{ error: string }>()
 )
+export const replaceOptimisticPost = createAction(
+  '[Posts] Replace Optimistic Post',
+  props<{ tmpId: string; post: Post }>()
+)
+export const removeOptimisticPost = createAction(
+  '[Posts] Remove Optimistic Post',
+  props<{ tmpId: string }>()
+)

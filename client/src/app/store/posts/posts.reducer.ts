@@ -18,5 +18,20 @@ export const postsReducer = createReducer(
   })),
   on(PostsActions.createPostSuccess, (state, { post }) =>
     postsAdapter.addOne(post, state)
+  ),
+  on(PostsActions.replaceOptimisticPost, (state, { tmpId, post }) => {
+    const { image: _, ...postWithoutImage } = post
+    return postsAdapter.updateOne(
+      {
+        id: tmpId,
+        changes: {
+          ...postWithoutImage,
+        },
+      },
+      state
+    )
+  }),
+  on(PostsActions.removeOptimisticPost, (state, { tmpId }) =>
+    postsAdapter.removeOne(tmpId, state)
   )
 )

@@ -13,6 +13,11 @@ describe('Posts Reducer', () => {
     body: 'test',
     image: null,
   } as Post
+  const tmpPost = {
+    id: 'tmp-5',
+    body: 'test',
+    image: null,
+  } as Post
 
   it('should return the initial state', () => {
     expect(postsReducer(undefined, { type: 'unknown' })).toEqual(initialState)
@@ -60,6 +65,33 @@ describe('Posts Reducer', () => {
       const expectedState = postsAdapter.addOne(mockPost, initialState)
 
       expect(state.loading).toEqual(false)
+      expect(state).toEqual(expectedState)
+    })
+
+    it('should replace optimistic post', () => {
+      const state = postsReducer(
+        initialState,
+        PostsActions.replaceOptimisticPost({ tmpId: 'tmp-5', post: mockPost })
+      )
+      postsAdapter.addOne(tmpPost, state)
+
+      const expectedState = postsAdapter.updateOne(
+        { id: 'tmp-5', changes: mockPost },
+        state
+      )
+
+      expect(state).toEqual(expectedState)
+    })
+
+    it('should remove optimistic post', () => {
+      const state = postsReducer(
+        initialState,
+        PostsActions.removeOptimisticPost({ tmpId: 'tmp-5' })
+      )
+      postsAdapter.addOne(tmpPost, state)
+
+      const expectedState = postsAdapter.removeOne('tmp-5', state)
+
       expect(state).toEqual(expectedState)
     })
   })
