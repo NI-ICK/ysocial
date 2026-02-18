@@ -2,14 +2,18 @@ import { CommonModule, NgIf } from '@angular/common'
 import { Component, OnInit } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { Observable } from 'rxjs'
-import { AuthService } from '../../../features/auth/auth-service/auth.service'
 import { LoginFormComponent } from '../../../features/auth/login-form/login-form.component'
 import { RegisterFormComponent } from '../../../features/auth/register-form/register-form.component'
 import { UserMenuComponent } from '../../../features/nav/user-menu/user-menu.component'
 import { ModalWrapperComponent } from '../../../shared/modal-wrapper/modal-wrapper.component'
-import { AuthState } from '../../../utils/auth-state.enum'
+import { AuthStatus } from '../../../utils/auth-status.enum'
 import { User } from '../../../utils/user.interface'
 import { ImagePreloadDirective } from '../../../shared/directives/image-preload/image-preload.directive'
+import { Store } from '@ngrx/store'
+import {
+  selectAuthStatus,
+  selectCurrentUser,
+} from '../../../store/auth/auth.selectors'
 
 @Component({
   selector: 'navbar',
@@ -27,18 +31,18 @@ import { ImagePreloadDirective } from '../../../shared/directives/image-preload/
   styleUrl: './navbar.component.scss',
 })
 export class NavbarComponent implements OnInit {
-  public AuthState = AuthState
+  public AuthStatus = AuthStatus
   showLoginModal = false
   showRegisterModal = false
   showMenu = false
   currentUser$!: Observable<User | null>
-  authState$!: Observable<AuthState | null>
+  authStatus$!: Observable<AuthStatus | null>
 
-  constructor(private authService: AuthService) {}
+  constructor(private store: Store) {}
 
   ngOnInit() {
-    this.currentUser$ = this.authService.getCurrentUser()
-    this.authState$ = this.authService.getAuthState()
+    this.currentUser$ = this.store.select(selectCurrentUser)
+    this.authStatus$ = this.store.select(selectAuthStatus)
   }
 
   openLoginModal = () => (this.showLoginModal = true)

@@ -1,37 +1,45 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { LoginFormComponent } from './login-form.component'
-import {
-  ApolloTestingController,
-  ApolloTestingModule,
-} from 'apollo-angular/testing'
-import { LOGIN_USER } from '../../../graphql/auth.operations'
-import { AuthService } from '../auth-service/auth.service'
 import { By } from '@angular/platform-browser'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { selectLoginSuccess } from '../../../store/auth/auth.selectors'
+import { loginUser } from '../../../store/auth/auth.actions'
 
 describe('LoginFormComponent', () => {
   let component: LoginFormComponent
-  let apolloController: ApolloTestingController
   let fixture: ComponentFixture<LoginFormComponent>
-  const authServiceMock = {
-    loadUser: jest.fn(),
-  }
+  let store: MockStore
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LoginFormComponent, ApolloTestingModule],
-      providers: [{ provide: AuthService, useValue: authServiceMock }],
+      imports: [LoginFormComponent],
+      providers: [provideMockStore()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(LoginFormComponent)
     component = fixture.componentInstance
-    apolloController = TestBed.inject(ApolloTestingController)
+    store = TestBed.inject(MockStore)
 
     fixture.detectChanges()
+
+    jest.spyOn(store, 'dispatch')
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(apolloController).toBeTruthy()
+  })
+
+  it('should emit loginSuccess when login is successfull', () => {
+    const loginSuccessSpy = jest.spyOn(component.loginSuccess, 'emit')
+
+    store.overrideSelector(selectLoginSuccess, false)
+
+    component.ngOnInit()
+
+    store.overrideSelector(selectLoginSuccess, true)
+    store.refreshState()
+
+    expect(loginSuccessSpy).toHaveBeenCalled()
   })
 
   it('should emit openRegisterModal when clicking Sign Up span', async () => {
@@ -49,33 +57,17 @@ describe('LoginFormComponent', () => {
 
       component.handleFormSubmit()
 
-      expect(() => apolloController.expectOne(LOGIN_USER)).toThrow()
+      expect(store.dispatch).not.toHaveBeenCalled()
     })
 
-    it('should call LOGIN_USER mutation if form is valid', () => {
+    it('should call dispatch if form is valid', () => {
       component.loginForm.setValue({ email: 'test@test.com', password: 'test' })
 
       component.handleFormSubmit()
 
-      const op = apolloController.expectOne(LOGIN_USER)
-      op.flush({ data: { loginUserData: { token: '123' } } })
-      apolloController.verify()
-    })
-
-    it('should emit loginSuccess on mutation success', async () => {
-      const loginSuccessSpy = jest.spyOn(component.loginSuccess, 'emit')
-      component.loginForm.setValue({ email: 'test@test.com', password: 'test' })
-
-      component.handleFormSubmit()
-
-      const op = apolloController.expectOne(LOGIN_USER)
-      op.flush({ data: { loginUserData: { access_token: '123' } } })
-      apolloController.verify()
-
-      await fixture.whenStable()
-
-      expect(authServiceMock.loadUser).toHaveBeenCalled()
-      expect(loginSuccessSpy).toHaveBeenCalled()
+      expect(store.dispatch).toHaveBeenCalledWith(
+        loginUser({ email: 'test@test.com', password: 'test' })
+      )
     })
   })
 })

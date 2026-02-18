@@ -1,27 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { CreatePostFormComponent } from './create-post-form.component'
-import { AuthService } from '../../auth/auth-service/auth.service'
-import { of } from 'rxjs'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { createPost } from '../../../store/posts/posts.actions'
 
 describe('CreatePostFormComponent', () => {
   let component: CreatePostFormComponent
   let fixture: ComponentFixture<CreatePostFormComponent>
-  let authService: Partial<AuthService>
   let store: MockStore
 
   beforeEach(async () => {
-    authService = {
-      getCurrentUser: jest.fn().mockReturnValue(of({ id: '1' })),
-    }
-
     await TestBed.configureTestingModule({
       imports: [CreatePostFormComponent],
-      providers: [
-        provideMockStore(),
-        { provide: AuthService, useValue: authService },
-      ],
+      providers: [provideMockStore()],
     }).compileComponents()
 
     store = TestBed.inject(MockStore)

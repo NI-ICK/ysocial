@@ -1,31 +1,44 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { RegisterFormComponent } from './register-form.component'
-import {
-  ApolloTestingController,
-  ApolloTestingModule,
-} from 'apollo-angular/testing'
-import { REGISTER_USER } from '../../../graphql/auth.operations'
 import { FormBuilder, Validators } from '@angular/forms'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { registerUser } from '../../../store/auth/auth.actions'
+import { selectRegisterSuccess } from '../../../store/auth/auth.selectors'
 
 describe('RegisterFormComponent', () => {
   let component: RegisterFormComponent
-  let apolloController: ApolloTestingController
   let fixture: ComponentFixture<RegisterFormComponent>
+  let store: MockStore
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RegisterFormComponent, ApolloTestingModule],
+      imports: [RegisterFormComponent],
+      providers: [provideMockStore()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(RegisterFormComponent)
     component = fixture.componentInstance
-    apolloController = TestBed.inject(ApolloTestingController)
+    store = TestBed.inject(MockStore)
     fixture.detectChanges()
+
+    jest.spyOn(store, 'dispatch')
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
-    expect(apolloController).toBeTruthy()
+  })
+
+  it('should emit registerSuccess when register is successfull', () => {
+    const registerSuccessSpy = jest.spyOn(component.registerSuccess, 'emit')
+
+    store.overrideSelector(selectRegisterSuccess, false)
+
+    component.ngOnInit()
+
+    store.overrideSelector(selectRegisterSuccess, true)
+    store.refreshState()
+
+    expect(registerSuccessSpy).toHaveBeenCalled()
   })
 
   describe('handleFormSubmit', () => {
@@ -39,10 +52,10 @@ describe('RegisterFormComponent', () => {
 
       component.handleFormSubmit()
 
-      expect(() => apolloController.expectOne(REGISTER_USER)).toThrow()
+      expect(store.dispatch).not.toHaveBeenCalled()
     })
 
-    it('should call REGISTER_USER mutation if form is valid', () => {
+    it('should call dispatch if form is valid', () => {
       component.registerForm.setValue({
         username: 'test',
         email: 'test@gmail.com',
@@ -52,17 +65,13 @@ describe('RegisterFormComponent', () => {
 
       component.handleFormSubmit()
 
-      const op = apolloController.expectOne(REGISTER_USER)
-      op.flush({
-        data: {
-          registerUserData: {
-            id: '1',
-            username: 'test',
-            email: 'test@gmail.com',
-          },
-        },
-      })
-      apolloController.verify()
+      expect(store.dispatch).toHaveBeenCalledWith(
+        registerUser({
+          username: 'test',
+          email: 'test@gmail.com',
+          password: 'test',
+        })
+      )
     })
   })
 

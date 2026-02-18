@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import {
   AbstractControl,
   FormBuilder,
@@ -7,11 +7,12 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms'
-import { Apollo } from 'apollo-angular'
-import { REGISTER_USER } from '../../../graphql/auth.operations'
 import { PasswordFieldComponent } from '../../../shared/password-field/password-field.component'
 import { PrintErrorComponent } from '../../../shared/print-error/print-error.component'
-import { PopupService } from '../../../shared/popup/popup.service'
+import { Store } from '@ngrx/store'
+import { registerUser } from '../../../store/auth/auth.actions'
+import { filter, take } from 'rxjs'
+import { selectRegisterSuccess } from '../../../store/auth/auth.selectors'
 
 @Component({
   selector: 'register-form',
@@ -20,12 +21,22 @@ import { PopupService } from '../../../shared/popup/popup.service'
   templateUrl: './register-form.component.html',
   styleUrl: './register-form.component.scss',
 })
-export class RegisterFormComponent {
-  constructor(
-    private fb: FormBuilder,
-    private apollo: Apollo,
-    private popupService: PopupService
-  ) {}
+export class RegisterFormComponent implements OnInit {
+  @Output() registerSuccess = new EventEmitter()
+
+  constructor(private fb: FormBuilder, private store: Store) {}
+
+  ngOnInit(): void {
+    this.store
+      .select(selectRegisterSuccess)
+      .pipe(
+        filter((success) => success),
+        take(1)
+      )
+      .subscribe(() => {
+        this.registerSuccess.emit()
+      })
+  }
 
   registerForm = this.fb.group(
     {
@@ -57,20 +68,11 @@ export class RegisterFormComponent {
   handleFormSubmit() {
     if (this.registerForm.invalid) return
 
-    this.apollo
-      .mutate({
-        mutation: REGISTER_USER,
-        variables: {
-          username: this.registerForm.get('username')?.value,
-          email: this.registerForm.get('email')?.value,
-          password: this.registerForm.get('password')?.value,
-        },
-      })
-      .subscribe({
-        error: (err) => {
-          this.popupService.showPopup(err.message || 'Sign Up Failed')
-        },
-      })
+    const username = this.registerForm.get('username')?.value!
+    const email = this.registerForm.get('email')?.value!
+    const password = this.registerForm.get('password')?.value!
+
+    this.store.dispatch(registerUser({ username, email, password }))
   }
 
   get passwordControl() {

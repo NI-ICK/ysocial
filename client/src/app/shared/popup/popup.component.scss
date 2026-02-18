@@ -9,6 +9,7 @@ div {
   background-color: black;
   min-width: 10em;
   transform: translateX(150%);
+  z-index: 300;
 
   &.active {
     animation: slide-in 4.5s ease-in-out;

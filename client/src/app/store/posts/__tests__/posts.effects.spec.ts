@@ -1,17 +1,19 @@
 import { Observable, of, throwError } from 'rxjs'
 import { PostsEffects } from '../posts.effects'
 import { provideMockActions } from '@ngrx/effects/testing'
-import { AuthService } from '../../../features/auth/auth-service/auth.service'
 import { PopupService } from '../../../shared/popup/popup.service'
 import { TestBed } from '@angular/core/testing'
 import { Post } from '../../../utils/post.interface'
 import * as PostsActions from '../posts.actions'
 import { PostsService } from '../../../features/posts/posts-service/posts.service'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { selectCurrentUser } from '../../auth/auth.selectors'
+import { User } from '../../../utils/user.interface'
 
 describe('Posts Effects', () => {
   let actions$: Observable<any>
   let effects: PostsEffects
-  let authService: Partial<AuthService>
+  let store: MockStore
   let popupService: Partial<PopupService>
   let postsService: Partial<PostsService>
 
@@ -26,9 +28,6 @@ describe('Posts Effects', () => {
     popupService = {
       showPopup: jest.fn(),
     }
-    authService = {
-      getCurrentUser: jest.fn(),
-    }
     postsService = {
       getAllPosts: jest.fn(),
       createPost: jest.fn(),
@@ -38,12 +37,13 @@ describe('Posts Effects', () => {
       providers: [
         PostsEffects,
         provideMockActions(() => actions$),
-        { provide: AuthService, useValue: authService },
+        provideMockStore(),
         { provide: PopupService, useValue: popupService },
         { provide: PostsService, useValue: postsService },
       ],
     })
     effects = TestBed.inject(PostsEffects)
+    store = TestBed.inject(MockStore)
   })
 
   describe('loadPosts', () => {
@@ -62,7 +62,7 @@ describe('Posts Effects', () => {
     })
 
     it('should dispatch loadPostsFailure when postsService.getAllPosts fails', () => {
-      ;(postsService.getAllPosts as jest.Mock).mockReturnValue(() =>
+      ;(postsService.getAllPosts as jest.Mock).mockReturnValue(
         throwError(() => new Error('test error'))
       )
       actions$ = of(PostsActions.loadPosts())
@@ -77,9 +77,7 @@ describe('Posts Effects', () => {
 
   describe('createPost', () => {
     it('should dispatch createPostSuccess and call popupService when postsService.createPost succeeds', () => {
-      ;(authService.getCurrentUser as jest.Mock).mockReturnValue(
-        of({ id: '1' })
-      )
+      store.overrideSelector(selectCurrentUser, { id: '1' } as User)
       ;(postsService.createPost as jest.Mock).mockReturnValue(postMock)
 
       actions$ = of(
@@ -97,10 +95,8 @@ describe('Posts Effects', () => {
       })
     })
 
-    it('should dispatch createPostFailure when CREATE_POST fails', () => {
-      ;(authService.getCurrentUser as jest.Mock).mockReturnValue(
-        of({ id: '1' })
-      )
+    it('should dispatch createPostFailure when authService.createPost fails', () => {
+      store.overrideSelector(selectCurrentUser, { id: '1' } as User)
       ;(postsService.createPost as jest.Mock).mockReturnValue(
         throwError(() => new Error('test error'))
       )

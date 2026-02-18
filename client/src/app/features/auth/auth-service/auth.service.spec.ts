@@ -1,30 +1,23 @@
 import { TestBed } from '@angular/core/testing'
 import { AuthService } from './auth.service'
-import { isPlatformBrowser } from '@angular/common'
-import { forkJoin } from 'rxjs'
-import { PLATFORM_ID } from '@angular/core'
 import {
   ApolloTestingController,
   ApolloTestingModule,
 } from 'apollo-angular/testing'
-import { AuthState } from '../../../utils/auth-state.enum'
-import { GET_CURRENT_USER, LOGOUT_USER } from '../../../graphql/auth.operations'
-
-jest.mock('@angular/common', () => ({
-  ...jest.requireActual('@angular/common'),
-  isPlatformBrowser: jest.fn(),
-}))
+import {
+  GET_CURRENT_USER,
+  LOGIN_USER,
+  LOGOUT_USER,
+  REGISTER_USER,
+} from '../../../graphql/auth.operations'
 
 describe('AuthService', () => {
   let authService: AuthService
   let apolloController: ApolloTestingController
 
   beforeEach(() => {
-    ;(isPlatformBrowser as jest.Mock).mockReturnValue(true)
-
     TestBed.configureTestingModule({
       imports: [ApolloTestingModule],
-      providers: [{ provide: PLATFORM_ID, useValue: 'browser' }],
     })
     authService = TestBed.inject(AuthService)
     apolloController = TestBed.inject(ApolloTestingController)
@@ -35,102 +28,48 @@ describe('AuthService', () => {
     expect(apolloController).toBeTruthy()
   })
 
-  describe('loadUser', () => {
-    it('should set AUTHENTICATED state and currentUser on success', () => {
-      const mockUser = { id: '1', username: 'test' }
-
-      authService.loadUser()
-
-      const op = apolloController.expectOne(GET_CURRENT_USER)
-      op.flush({ data: { getCurrentUser: mockUser } })
-      apolloController.verify()
-
-      forkJoin([
-        authService.getAuthState(),
-        authService.getCurrentUser(),
-      ]).subscribe(([authState, user]) => {
-        expect(authState).toBe(AuthState.AUTHENTICATED)
-        expect(user).toEqual(mockUser)
-      })
+  it('should login user', () => {
+    authService.loginUser('test@gmail.com', 'test').subscribe((result: any) => {
+      expect(result.data.loginUser.id).toEqual('1')
+      expect(result.data.loginUser.email).toEqual('test@gmail.com')
     })
 
-    it('should set UNAUTHENTICATED state when currentUser is null', () => {
-      authService.loadUser()
-
-      const op = apolloController.expectOne(GET_CURRENT_USER)
-      op.flush({ data: { getCurrentUser: null } })
-      apolloController.verify()
-
-      forkJoin([
-        authService.getAuthState(),
-        authService.getCurrentUser(),
-      ]).subscribe(([authState, user]) => {
-        expect(authState).toBe(AuthState.UNAUTHENTICATED)
-        expect(user).toEqual(null)
-      })
-    })
-
-    it('should set UNAUTHENTICATED state on error', () => {
-      authService.loadUser()
-
-      const op = apolloController.expectOne(GET_CURRENT_USER)
-      op.graphqlErrors([])
-      apolloController.verify()
-
-      forkJoin([
-        authService.getAuthState(),
-        authService.getCurrentUser(),
-      ]).subscribe(([authState, user]) => {
-        expect(authState).toBe(AuthState.UNAUTHENTICATED)
-        expect(user).toEqual(null)
-      })
-    })
-
-    it('should not call loadUser if platform is server', () => {
-      ;(isPlatformBrowser as jest.Mock).mockReturnValue(false)
-
-      const loadUserSpy = jest.spyOn(authService, 'loadUser')
-      expect(loadUserSpy).not.toHaveBeenCalled()
-    })
+    const op = apolloController.expectOne(LOGIN_USER)
+    op.flush({ data: { loginUser: { id: '1', email: 'test@gmail.com' } } })
+    apolloController.verify()
   })
 
-  describe('logoutUser', () => {
-    beforeEach(() => {
-      const op = apolloController.expectOne(GET_CURRENT_USER)
-      op.flush({ data: { getCurrentUser: null } })
-      apolloController.verify()
-    })
-
-    it('should set UNAUTHENTICATED state on success', () => {
-      authService.logoutUser()
-
-      const op = apolloController.expectOne(LOGOUT_USER)
-      op.flush({ data: {} })
-      apolloController.verify()
-
-      forkJoin([
-        authService.getAuthState(),
-        authService.getCurrentUser(),
-      ]).subscribe(([authState, user]) => {
-        expect(authState).toBe(AuthState.UNAUTHENTICATED)
-        expect(user).toEqual(null)
+  it('should register user', () => {
+    authService
+      .registerUser('test', 'test@gmail.com', 'test')
+      .subscribe((result: any) => {
+        expect(result.data.register.id).toEqual('1')
+        expect(result.data.register.email).toEqual('test@gmail.com')
       })
+
+    const op = apolloController.expectOne(REGISTER_USER)
+    op.flush({ data: { registerUser: { id: '1', email: 'test@gmail.com' } } })
+    apolloController.verify()
+  })
+
+  it('should get current user', () => {
+    authService.getCurrentUser().subscribe((result: any) => {
+      expect(result.data.getCurrentUser.id).toEqual('1')
+      expect(result.data.getCurrentUser.email).toEqual('test@gmail.com')
     })
 
-    it('should set UNAUTHENTICATED state on error', () => {
-      authService.logoutUser()
+    const op = apolloController.expectOne(GET_CURRENT_USER)
+    op.flush({ data: { getCurrentUser: { id: '1', email: 'test@gmail.com' } } })
+    apolloController.verify()
+  })
 
-      const op = apolloController.expectOne(LOGOUT_USER)
-      op.graphqlErrors([])
-      apolloController.verify()
-
-      forkJoin([
-        authService.getAuthState(),
-        authService.getCurrentUser(),
-      ]).subscribe(([authState, user]) => {
-        expect(authState).toBe(AuthState.UNAUTHENTICATED)
-        expect(user).toEqual(null)
-      })
+  it('should logout user', () => {
+    authService.logoutUser().subscribe((result: any) => {
+      expect(result.data.loginUser.success).toEqual(true)
     })
+
+    const op = apolloController.expectOne(LOGOUT_USER)
+    op.flush({ data: { logoutUser: { success: true } } })
+    apolloController.verify()
   })
 })

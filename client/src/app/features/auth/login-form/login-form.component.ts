@@ -1,19 +1,19 @@
-import { Component, EventEmitter, Output } from '@angular/core'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core'
 import {
   FormBuilder,
   FormControl,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms'
-import { Apollo } from 'apollo-angular'
-import { LOGIN_USER } from '../../../graphql/auth.operations'
 import { GoogleIconComponent } from '../../../shared/icons/google-icon/google-icon.component'
 import { PasswordFieldComponent } from '../../../shared/password-field/password-field.component'
 import { GithubIconComponent } from '../../../shared/icons/github-icon/github-icon.component'
 import { environment } from '../../../../environments/environment.development'
-import { AuthService } from '../auth-service/auth.service'
 import { PrintErrorComponent } from '../../../shared/print-error/print-error.component'
-import { PopupService } from '../../../shared/popup/popup.service'
+import { Store } from '@ngrx/store'
+import { loginUser } from '../../../store/auth/auth.actions'
+import { filter, take } from 'rxjs'
+import { selectLoginSuccess } from '../../../store/auth/auth.selectors'
 
 @Component({
   selector: 'login-form',
@@ -27,16 +27,24 @@ import { PopupService } from '../../../shared/popup/popup.service'
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss',
 })
-export class LoginFormComponent {
+export class LoginFormComponent implements OnInit {
   @Output() loginSuccess = new EventEmitter()
   @Output() openRegisterModal = new EventEmitter()
   private fb: FormBuilder = new FormBuilder()
 
-  constructor(
-    private apollo: Apollo,
-    private authService: AuthService,
-    private popupService: PopupService
-  ) {}
+  constructor(private store: Store) {}
+
+  ngOnInit(): void {
+    this.store
+      .select(selectLoginSuccess)
+      .pipe(
+        filter((success) => success),
+        take(1)
+      )
+      .subscribe(() => {
+        this.loginSuccess.emit()
+      })
+  }
 
   loginForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -54,24 +62,10 @@ export class LoginFormComponent {
   handleFormSubmit() {
     if (this.loginForm.invalid) return
 
-    this.apollo
-      .mutate({
-        mutation: LOGIN_USER,
-        variables: {
-          email: this.loginForm.get('email')?.value,
-          password: this.loginForm.get('password')?.value,
-        },
-      })
-      .subscribe({
-        next: () => {
-          this.authService.loadUser()
-          this.loginSuccess.emit()
-        },
-        error: (err) => {
-          console.log(err)
-          this.popupService.showPopup(err.message || 'Sign In Failed')
-        },
-      })
+    const email = this.loginForm.get('email')?.value!
+    const password = this.loginForm.get('password')?.value!
+
+    this.store.dispatch(loginUser({ email, password }))
   }
 
   get passwordControl() {

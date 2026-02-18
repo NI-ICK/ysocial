@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core'
-import { AuthService } from '../../auth/auth-service/auth.service'
+import { Store } from '@ngrx/store'
+import { logoutUser } from '../../../store/auth/auth.actions'
 
 @Component({
   selector: 'user-menu',
@@ -9,10 +10,10 @@ import { AuthService } from '../../auth/auth-service/auth.service'
 export class UserMenuComponent {
   @Output() closeMenu = new EventEmitter()
 
-  constructor(private authService: AuthService) {}
+  constructor(private store: Store) {}
 
   logoutUser() {
-    this.authService.logoutUser()
+    this.store.dispatch(logoutUser())
     this.closeMenu.emit()
   }
 }

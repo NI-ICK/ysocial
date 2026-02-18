@@ -2,13 +2,13 @@
   <div>
     <a routerLink="/">YSocial</a>
   </div>
-  <ng-container *ngIf="authState$ | async as state">
+  <ng-container *ngIf="authStatus$ | async as status">
     <ng-container *ngIf="currentUser$ | async as currentUser">
       <div class="profile" (click)="openMenu()" *ngIf="currentUser.imagePath">
         <img [src]="currentUser.imagePath" default="profile" />
       </div>
     </ng-container>
-    <div *ngIf="state === AuthState.UNAUTHENTICATED">
+    <div *ngIf="status === AuthStatus.UNAUTHENTICATED">
       <button (click)="openLoginModal()">Sign In</button>
     </div>
   </ng-container>
@@ -23,7 +23,7 @@
 </modal-wrapper>
 
 <modal-wrapper *ngIf="showRegisterModal" (close)="closeRegisterModal()">
-  <register-form></register-form>
+  <register-form (registerSuccess)="closeRegisterModal()"></register-form>
 </modal-wrapper>
 
 <modal-wrapper

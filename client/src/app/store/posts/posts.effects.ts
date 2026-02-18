@@ -1,27 +1,19 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { AuthService } from '../../features/auth/auth-service/auth.service'
 import { PopupService } from '../../shared/popup/popup.service'
 import * as PostsActions from './posts.actions'
-import { catchError, map, of, switchMap, tap } from 'rxjs'
-import { Post } from '../../utils/post.interface'
+import { catchError, map, of, switchMap, take, tap } from 'rxjs'
 import { PostsService } from '../../features/posts/posts-service/posts.service'
-
-interface GetAllPostsResponse {
-  getAllPosts: Post[]
-}
-
-interface CreatePostResponse {
-  createPost: Post
-}
+import { Store } from '@ngrx/store'
+import { selectCurrentUser } from '../auth/auth.selectors'
 
 @Injectable()
 export class PostsEffects {
   constructor(
     private actions$: Actions,
     private postsService: PostsService,
-    private authService: AuthService,
-    private popupService: PopupService
+    private popupService: PopupService,
+    private store: Store
   ) {}
 
   loadPosts$ = createEffect(() =>
@@ -46,7 +38,8 @@ export class PostsEffects {
     this.actions$.pipe(
       ofType(PostsActions.createPost),
       switchMap(({ body, file }) =>
-        this.authService.getCurrentUser().pipe(
+        this.store.select(selectCurrentUser).pipe(
+          take(1),
           switchMap((user) => {
             if (!user)
               return of(

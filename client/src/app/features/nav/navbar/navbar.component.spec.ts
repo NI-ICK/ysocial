@@ -1,12 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { NavbarComponent } from './navbar.component'
-import { AuthService } from '../../auth/auth-service/auth.service'
 import { RouterModule } from '@angular/router'
-import { of } from 'rxjs'
-import { AuthState } from '../../../utils/auth-state.enum'
+import { AuthStatus } from '../../../utils/auth-status.enum'
 import { By } from '@angular/platform-browser'
 import { Component, Input } from '@angular/core'
 import { CommonModule } from '@angular/common'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import {
+  selectAuthStatus,
+  selectCurrentUser,
+} from '../../../store/auth/auth.selectors'
+import { User } from '../../../utils/user.interface'
 
 @Component({ selector: 'modal-wrapper' })
 class ModalWrapperComponentMock {
@@ -22,17 +26,12 @@ class UserMenuComponentMock {}
 describe('NavbarComponent', () => {
   let component: NavbarComponent
   let fixture: ComponentFixture<NavbarComponent>
-  let authServiceMock: Partial<AuthService>
+  let store: MockStore
 
   beforeEach(async () => {
-    authServiceMock = {
-      getCurrentUser: jest.fn(),
-      getAuthState: jest.fn(),
-    }
-
     await TestBed.configureTestingModule({
       imports: [NavbarComponent, RouterModule.forRoot([])],
-      providers: [{ provide: AuthService, useValue: authServiceMock }],
+      providers: [provideMockStore()],
     })
       .overrideComponent(NavbarComponent, {
         set: {
@@ -48,23 +47,20 @@ describe('NavbarComponent', () => {
 
     fixture = TestBed.createComponent(NavbarComponent)
     component = fixture.componentInstance
+
+    store = TestBed.inject(MockStore)
+    store.overrideSelector(selectCurrentUser, null)
+    store.overrideSelector(selectAuthStatus, AuthStatus.UNAUTHENTICATED)
+    store.refreshState()
+
     fixture.detectChanges()
   })
 
   it('should create', () => {
-    ;(authServiceMock.getCurrentUser as jest.Mock).mockReturnValue(of(null))
-    ;(authServiceMock.getAuthState as jest.Mock).mockReturnValue(
-      of(AuthState.UNAUTHENTICATED)
-    )
     expect(component).toBeTruthy()
   })
 
   it('should show Sign In button when UNAUTHENTICATED', () => {
-    ;(authServiceMock.getCurrentUser as jest.Mock).mockReturnValue(of(null))
-    ;(authServiceMock.getAuthState as jest.Mock).mockReturnValue(
-      of(AuthState.UNAUTHENTICATED)
-    )
-
     component.ngOnInit()
     fixture.detectChanges()
 
@@ -73,11 +69,14 @@ describe('NavbarComponent', () => {
   })
 
   it('should show user profile image when AUTHENTICATED', () => {
-    const mockUser = { id: '1', username: 'test', imagePath: 'image.png' }
-    ;(authServiceMock.getCurrentUser as jest.Mock).mockReturnValue(of(mockUser))
-    ;(authServiceMock.getAuthState as jest.Mock).mockReturnValue(
-      of(AuthState.AUTHENTICATED)
-    )
+    const mockUser = {
+      id: '1',
+      username: 'test',
+      imagePath: 'image.png',
+    } as User
+    store.overrideSelector(selectCurrentUser, mockUser)
+    store.overrideSelector(selectAuthStatus, AuthStatus.AUTHENTICATED)
+    store.refreshState()
 
     component.ngOnInit()
     fixture.detectChanges()
@@ -88,11 +87,6 @@ describe('NavbarComponent', () => {
   })
 
   it('should open and close login modal', () => {
-    ;(authServiceMock.getCurrentUser as jest.Mock).mockReturnValue(of(null))
-    ;(authServiceMock.getAuthState as jest.Mock).mockReturnValue(
-      of(AuthState.UNAUTHENTICATED)
-    )
-
     component.openLoginModal()
     fixture.detectChanges()
 
@@ -109,11 +103,6 @@ describe('NavbarComponent', () => {
   })
 
   it('should open and close user menu', () => {
-    ;(authServiceMock.getCurrentUser as jest.Mock).mockReturnValue(of(null))
-    ;(authServiceMock.getAuthState as jest.Mock).mockReturnValue(
-      of(AuthState.UNAUTHENTICATED)
-    )
-
     component.openMenu()
     fixture.detectChanges()
 

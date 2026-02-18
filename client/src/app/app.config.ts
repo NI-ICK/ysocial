@@ -19,6 +19,8 @@ import { provideEffects } from '@ngrx/effects'
 import { provideStoreDevtools } from '@ngrx/store-devtools'
 import { postsReducer } from './store/posts/posts.reducer'
 import { PostsEffects } from './store/posts/posts.effects'
+import { AuthEffects } from './store/auth/auth.effects'
+import { authReducer } from './store/auth/auth.reducer'
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,8 +38,9 @@ export const appConfig: ApplicationConfig = {
     })),
     provideStore({
       posts: postsReducer,
+      auth: authReducer,
     }),
-    provideEffects([PostsEffects]),
+    provideEffects([PostsEffects, AuthEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 }

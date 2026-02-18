@@ -1,26 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { UserMenuComponent } from './user-menu.component'
-import { AuthService } from '../../auth/auth-service/auth.service'
 import { By } from '@angular/platform-browser'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { logoutUser } from '../../../store/auth/auth.actions'
 
 describe('UserMenuComponent', () => {
   let component: UserMenuComponent
   let fixture: ComponentFixture<UserMenuComponent>
-  let authServiceMock: Partial<AuthService>
+  let store: MockStore
 
   beforeEach(async () => {
-    authServiceMock = {
-      logoutUser: jest.fn(),
-    }
-
     await TestBed.configureTestingModule({
       imports: [UserMenuComponent],
-      providers: [{ provide: AuthService, useValue: authServiceMock }],
+      providers: [provideMockStore()],
     }).compileComponents()
 
     fixture = TestBed.createComponent(UserMenuComponent)
     component = fixture.componentInstance
+    store = TestBed.inject(MockStore)
+
     fixture.detectChanges()
+
+    jest.spyOn(store, 'dispatch')
   })
 
   it('should create', () => {
@@ -28,11 +29,11 @@ describe('UserMenuComponent', () => {
   })
 
   describe('logoutUser', () => {
-    it('should call authService.logoutUser and emit event', () => {
+    it('should call logoutUser action and emit event', () => {
       const closeMenuSpy = jest.spyOn(component.closeMenu, 'emit')
       component.logoutUser()
 
-      expect(authServiceMock.logoutUser).toHaveBeenCalled()
+      expect(store.dispatch).toHaveBeenCalledWith(logoutUser())
       expect(closeMenuSpy).toHaveBeenCalled()
     })
 

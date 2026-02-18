@@ -1,17 +1,5 @@
 import { gql } from 'apollo-angular'
 
-export const GET_USERS = gql`
-  query {
-    getAllUsers {
-      id
-      username
-      email
-      provider
-      providerId
-    }
-  }
-`
-
 export const LOGIN_USER = gql`
   mutation loginUser($email: String!, $password: String!) {
     loginUser(loginUserData: { email: $email, password: $password }) {
