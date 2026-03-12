@@ -40,6 +40,7 @@ export const appConfig: ApplicationConfig = {
       posts: postsReducer,
       auth: authReducer,
     }),
+    provideStoreDevtools(),
     provideEffects([PostsEffects, AuthEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],

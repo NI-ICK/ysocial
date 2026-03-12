@@ -1,0 +1,177 @@
+@use "colors" as *;
+@use "_form-controls.scss";
+
+.container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 4em); // Navbar
+}
+
+.post {
+  width: 40em;
+  min-height: 100%;
+  border-left: 0.1em solid $border;
+  border-right: 0.1em solid $border;
+  padding: 1em;
+}
+
+.details {
+  display: flex;
+  position: relative;
+
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    cursor: pointer;
+    padding-bottom: 1em;
+
+    p {
+      position: relative;
+      color: $accent-1;
+      font-weight: bold;
+
+      &:hover {
+        color: $accent-2;
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 0.1em;
+          background-color: $accent-2;
+        }
+      }
+    }
+
+    img {
+      height: 2.5em;
+      border-radius: 100%;
+      outline: 0.15em solid $border;
+    }
+  }
+
+  span {
+    position: relative;
+    width: 2.5em;
+    height: 2.5em;
+    margin-left: auto;
+    border-radius: 100%;
+    cursor: pointer;
+    padding: 0.5em;
+
+    &:hover {
+      background-color: $hover;
+    }
+
+    &::after {
+      position: absolute;
+      left: 50%;
+      top: 35%;
+      transform: translate(-50%, -50%);
+      content: ". . .";
+      font-weight: bold;
+      font-size: 1.2em;
+      white-space: nowrap;
+    }
+  }
+}
+
+.menu {
+  position: absolute;
+  top: 100%;
+  right: -3em;
+  background-color: black;
+  border: 0.1em solid $border;
+  border-radius: 0.5em;
+  padding: 0.5em;
+
+  p {
+    border-radius: 0.5em;
+    padding: 0.5em;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $hover;
+    }
+
+    &:last-of-type {
+      color: $danger;
+    }
+  }
+}
+
+.content {
+  .body {
+    margin-bottom: 0.5em;
+  }
+
+  img {
+    max-width: 100%;
+    max-height: 45em;
+    border-radius: 0.5em;
+  }
+}
+
+.date {
+  font-size: 0.9em;
+  color: $accent-1;
+}
+
+.edited {
+  margin-bottom: 1em;
+  font-size: 0.8em;
+  color: darkgray;
+}
+
+.confirmation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background-color: black;
+  padding: 1em;
+  border-radius: 0.5em;
+  font-size: 1.5em;
+  box-shadow: -0.5em 0.5em 1em -0.2em black;
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  button {
+    cursor: pointer;
+    padding: 0.5em 1em;
+    border: none;
+    background-color: $background-1;
+    margin-inline: 2em;
+    border-radius: 0.5em;
+    font-size: 0.7em;
+
+    &:hover {
+      background-color: $hover;
+    }
+  }
+
+  button:nth-of-type(1) {
+    color: white;
+  }
+
+  button:nth-of-type(2) {
+    color: $danger;
+  }
+}
+
+textarea {
+  resize: none;
+  overflow: hidden;
+}
+
+form {
+  font-size: 1.2em;
+}

@@ -1,4 +1,4 @@
-import { Observable, of, throwError } from 'rxjs'
+import { Observable, of, take, throwError } from 'rxjs'
 import { PostsEffects } from '../posts.effects'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { PopupService } from '../../../shared/popup/popup.service'
@@ -21,7 +21,7 @@ describe('Posts Effects', () => {
     id: '1',
     body: 'test',
     image: null,
-    createdAt: new Date(),
+    createdAt: new Date().toISOString(),
   } as Post
 
   beforeEach(() => {
@@ -31,6 +31,9 @@ describe('Posts Effects', () => {
     postsService = {
       getAllPosts: jest.fn(),
       createPost: jest.fn(),
+      getPostById: jest.fn(),
+      deletePost: jest.fn(),
+      editPost: jest.fn(),
     }
 
     TestBed.configureTestingModule({
@@ -133,6 +136,176 @@ describe('Posts Effects', () => {
         expect(action).toEqual(
           PostsActions.createPostFailure({ error: 'No user logged in' })
         )
+      })
+    })
+  })
+
+  describe('loadCurrentPost', () => {
+    it('should dispatch loadCurrentPostSuccess when postsService.getPostById succeeds', (done) => {
+      ;(postsService.getPostById as jest.Mock).mockReturnValue(
+        of({
+          data: {
+            getPostById: postMock,
+          },
+        })
+      )
+
+      actions$ = of(PostsActions.loadCurrentPost({ id: '1' }))
+
+      effects.loadCurrentPost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.loadCurrentPostSuccess({ post: postMock })
+        )
+        done()
+      })
+    })
+
+    it('should dispatch loadCurrentPostFailure when postsService.getPostById fails', (done) => {
+      ;(postsService.getPostById as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(PostsActions.loadCurrentPost({ id: '1' }))
+
+      effects.loadCurrentPost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.loadCurrentPostFailure({ error: 'test error' })
+        )
+        done()
+      })
+    })
+  })
+
+  describe('deletePost', () => {
+    it('should dispatch deletePostSuccess when postsService.deletePost succeeds', (done) => {
+      ;(postsService.deletePost as jest.Mock).mockReturnValue(
+        of({ data: { deletePost: { success: true, message: 'test' } } })
+      )
+
+      actions$ = of(PostsActions.deletePost({ post: postMock }))
+
+      effects.deletePost$.subscribe((action) => {
+        expect(action).toEqual(PostsActions.deletePostSuccess())
+      })
+      done()
+    })
+
+    it('should dispatch deletePostFailure when postsService.deletePost fails', (done) => {
+      ;(postsService.deletePost as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(PostsActions.deletePost({ post: postMock }))
+
+      effects.deletePost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.deletePostFailure({
+            error: 'test error',
+            post: postMock,
+          })
+        )
+        done()
+      })
+    })
+
+    describe('deletePostSuccess', () => {
+      it('should call popupService', (done) => {
+        actions$ = of(PostsActions.deletePostSuccess())
+
+        effects.deletePostSuccess$.subscribe(() => {
+          expect(popupService.showPopup).toHaveBeenCalledWith(
+            'Post Deleted Successfully'
+          )
+          done()
+        })
+      })
+    })
+
+    describe('deletePostFailure', () => {
+      it('should call popupService', (done) => {
+        actions$ = of(
+          PostsActions.deletePostFailure({
+            error: 'test error',
+            post: postMock,
+          })
+        )
+
+        effects.deletePostFailure$.subscribe(() => {
+          expect(popupService.showPopup).toHaveBeenCalledWith(
+            'Failed to Delete Post'
+          )
+          done()
+        })
+      })
+    })
+  })
+
+  describe('editPost', () => {
+    it('should dispatch editPostSuccess when postsService.editPost succeeds', (done) => {
+      ;(postsService.editPost as jest.Mock).mockReturnValue(
+        of({ data: { editPost: postMock } })
+      )
+
+      actions$ = of(
+        PostsActions.editPost({ id: '1', body: 'test2', prevBody: 'test' })
+      )
+
+      effects.editPost$.subscribe((action) => {
+        expect(action).toEqual(PostsActions.editPostSuccess({ post: postMock }))
+        done()
+      })
+    })
+
+    it('should dispatch editPostFailure when postsService.editPost fails', (done) => {
+      ;(postsService.editPost as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(
+        PostsActions.editPost({ id: '1', body: 'test2', prevBody: 'test' })
+      )
+
+      effects.editPost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.editPostFailure({
+            error: 'test error',
+            id: '1',
+            prevBody: 'test',
+          })
+        )
+        done()
+      })
+    })
+
+    describe('editPostSuccess', () => {
+      it('should call popupService', (done) => {
+        actions$ = of(PostsActions.editPostSuccess({ post: postMock }))
+
+        effects.editPostSuccess$.subscribe(() => {
+          expect(popupService.showPopup).toHaveBeenCalledWith(
+            'Post Edited Successfully'
+          )
+          done()
+        })
+      })
+    })
+
+    describe('editPostFailure', () => {
+      it('should call popupService', (done) => {
+        actions$ = of(
+          PostsActions.editPostFailure({
+            error: 'test error',
+            id: '1',
+            prevBody: 'test',
+          })
+        )
+
+        effects.editPostFailure$.subscribe(() => {
+          expect(popupService.showPopup).toHaveBeenCalledWith(
+            'Failed to Edit Post'
+          )
+          done()
+        })
       })
     })
   })

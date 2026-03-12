@@ -2,7 +2,8 @@ import { Post } from '../../utils/post.interface'
 import { EntityState, createEntityAdapter } from '@ngrx/entity'
 
 export interface PostsState extends EntityState<Post> {
-  loading: boolean
+  currentPostId: string | null
+  postsLoading: boolean
   error: string | null
 }
 
@@ -12,6 +13,7 @@ export const postsAdapter = createEntityAdapter<Post>({
 })
 
 export const initialState: PostsState = postsAdapter.getInitialState({
-  loading: false,
+  currentPostId: null,
+  postsLoading: false,
   error: null,
 })

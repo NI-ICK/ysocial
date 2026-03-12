@@ -1,11 +1,14 @@
 @use "colors" as *;
-@use "sass:color";
 
 .content {
+  position: fixed;
+  top: 3.7em;
+  right: 1em;
   background-color: black;
   padding: 0.5em;
   border-radius: 0.5em;
   border: 0.1em solid $border;
+  z-index: 500;
 
   p {
     cursor: pointer;
@@ -13,7 +16,7 @@
     font-size: 0.9em;
 
     &:hover {
-      background-color: color.mix(black, white, 80%);
+      background-color: $hover;
       border-radius: 0.5em;
     }
   }

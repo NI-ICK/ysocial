@@ -1,13 +1,23 @@
 <form [formGroup]="registerForm" (ngSubmit)="handleFormSubmit()">
   <h2>Sign Up</h2>
   <div class="field">
-    <label for="">USERNAME</label>
-    <input type="text" formControlName="username" placeholder="Username" />
+    <label for="username">USERNAME</label>
+    <input
+      type="text"
+      formControlName="username"
+      placeholder="Username"
+      id="username"
+    />
   </div>
   <print-error [control]="registerForm.get('username')"></print-error>
   <div class="field">
-    <label for="">EMAIL</label>
-    <input type="text" formControlName="email" placeholder="E-mail" />
+    <label for="email">EMAIL</label>
+    <input
+      type="text"
+      formControlName="email"
+      placeholder="E-mail"
+      id="email"
+    />
   </div>
   <print-error [control]="registerForm.get('email')"></print-error>
   <password-field

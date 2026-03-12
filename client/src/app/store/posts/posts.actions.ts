@@ -33,3 +33,43 @@ export const removeOptimisticPost = createAction(
   '[Posts] Remove Optimistic Post',
   props<{ tmpId: string }>()
 )
+
+// ----- Load Current Post -----
+export const loadCurrentPost = createAction(
+  '[Posts] Load Current Post',
+  props<{ id: string }>()
+)
+export const loadCurrentPostSuccess = createAction(
+  '[Posts] Load Current Post Success',
+  props<{ post: Post }>()
+)
+export const loadCurrentPostFailure = createAction(
+  '[Posts] Load Current Post Failure',
+  props<{ error: string }>()
+)
+export const clearCurrentPost = createAction('[Posts] Clear Current Post')
+
+// ----- Delete Post -----
+export const deletePost = createAction(
+  '[Posts] Delete Post',
+  props<{ post: Post }>()
+)
+export const deletePostSuccess = createAction('[Posts] Delete Post Success')
+export const deletePostFailure = createAction(
+  '[Posts] Delete Post Failure',
+  props<{ error: string; post: Post | null }>()
+)
+
+// ----- Edit Post -----
+export const editPost = createAction(
+  '[Posts] Edit Post',
+  props<{ id: string; body: string; prevBody: string | null }>()
+)
+export const editPostSuccess = createAction(
+  '[Posts] Edit Post Success',
+  props<{ post: Post }>()
+)
+export const editPostFailure = createAction(
+  '[Posts] Edit Post Failure',
+  props<{ error: string; prevBody: string | null; id: string }>()
+)

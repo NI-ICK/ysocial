@@ -1,12 +1,17 @@
-import { flush, TestBed } from '@angular/core/testing'
-
+import { TestBed } from '@angular/core/testing'
 import { PostsService } from './posts.service'
 import {
   ApolloTestingController,
   ApolloTestingModule,
 } from 'apollo-angular/testing'
 import { Post } from '../../../utils/post.interface'
-import { CREATE_POST, GET_ALL_POSTS } from '../../../graphql/post.operations'
+import {
+  CREATE_POST,
+  DELETE_POST,
+  EDIT_POST,
+  GET_ALL_POSTS,
+  GET_POST_BY_ID,
+} from '../../../graphql/post.operations'
 
 describe('PostsServiceService', () => {
   let service: PostsService
@@ -43,13 +48,74 @@ describe('PostsServiceService', () => {
   })
 
   describe('createPost', () => {
-    it('should return created post', () => {
+    it('should return created post with correct variables', () => {
       service.createPost('1', 'test', null).subscribe((result) => {
         expect(result.data?.createPost).toEqual(postMock)
       })
 
       const op = apolloController.expectOne(CREATE_POST)
+
+      expect(op.operation.variables).toEqual({
+        userId: '1',
+        body: 'test',
+        image: null,
+      })
+
       op.flush({ data: { createPost: postMock } })
+      apolloController.verify()
+    })
+  })
+
+  describe('getPostById', () => {
+    it('should return post with correct variables', () => {
+      service.getPostById('1').subscribe((result) => {
+        expect(result.data?.getPostById).toEqual(postMock)
+      })
+
+      const op = apolloController.expectOne(GET_POST_BY_ID)
+
+      expect(op.operation.variables).toEqual({
+        id: '1',
+      })
+
+      op.flush({ data: { getPostById: postMock } })
+      apolloController.verify()
+    })
+  })
+
+  describe('deletePost', () => {
+    it('should return message with correct variables', () => {
+      const deleteMock = { success: true, message: 'Test' }
+
+      service.deletePost('1').subscribe((result) => {
+        expect(result.data?.deletePost).toEqual(deleteMock)
+      })
+
+      const op = apolloController.expectOne(DELETE_POST)
+
+      expect(op.operation.variables).toEqual({
+        id: '1',
+      })
+
+      op.flush({ data: { deletePost: deleteMock } })
+      apolloController.verify()
+    })
+  })
+
+  describe('editPost', () => {
+    it('should return edited post', () => {
+      service.editPost('1', 'test').subscribe((result) => {
+        expect(result.data?.editPost).toEqual(postMock)
+      })
+
+      const op = apolloController.expectOne(EDIT_POST)
+
+      expect(op.operation.variables).toEqual({
+        id: '1',
+        body: 'test',
+      })
+
+      op.flush({ data: { editPost: postMock } })
       apolloController.verify()
     })
   })

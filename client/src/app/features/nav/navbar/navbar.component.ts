@@ -14,6 +14,7 @@ import {
   selectAuthStatus,
   selectCurrentUser,
 } from '../../../store/auth/auth.selectors'
+import { ClickOutsideDirective } from '../../../shared/directives/click-outside/click-outside.directive'
 
 @Component({
   selector: 'navbar',
@@ -26,6 +27,7 @@ import {
     RegisterFormComponent,
     UserMenuComponent,
     ImagePreloadDirective,
+    ClickOutsideDirective,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',

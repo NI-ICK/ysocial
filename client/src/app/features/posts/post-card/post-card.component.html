@@ -1,0 +1,33 @@
+<div
+  *ngIf="post"
+  class="post"
+  [routerLink]="
+    post.id.startsWith('tmp-') ? null : ['/', post.user.username, post.id]
+  "
+>
+  <div
+    class="profile"
+    [routerLink]="['/', post.user.username]"
+    (click)="$event.stopPropagation()"
+  >
+    <img [src]="post.user.imagePath" default="profile" />
+  </div>
+  <div class="content">
+    <a
+      [routerLink]="['/', post.user.username]"
+      (click)="$event.stopPropagation()"
+      >{{ post.user.username }}</a
+    >
+    <p>
+      {{ isBodyExpanded ? post.body : (post.body | slice : 0 : 200) }}
+      <span
+        *ngIf="(post.body ?? '').length > 200"
+        (click)="handleExpand(); $event.stopPropagation()"
+        class="expand-body"
+      >
+        {{ isBodyExpanded ? "" : "Read more..." }}
+      </span>
+    </p>
+    <img *ngIf="post.image" [src]="post.image" default="post" />
+  </div>
+</div>

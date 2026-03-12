@@ -11,7 +11,11 @@ import { Directive, Input, HostBinding } from '@angular/core'
 export class ImagePreloadDirective {
   @Input() src!: string
   @Input() default!: string
+
   @HostBinding('class') className = 'img'
+
+  @HostBinding('attr.referrerpolicy')
+  referrerPolicy = 'no-referrer'
 
   DEFAULT_PROFILE_IMG =
     'https://res.cloudinary.com/dzg5ek6qa/image/upload/v1767444425/noPhoto_hwrr7w_x4wghr.webp'
@@ -20,6 +24,13 @@ export class ImagePreloadDirective {
     'https://res.cloudinary.com/dzg5ek6qa/image/upload/v1771202006/default_placeholder_al9lhb.png'
 
   updateUrl = () => {
+    if (
+      this.src === this.DEFAULT_PROFILE_IMG ||
+      this.src === this.DEFAULT_POST_IMG
+    ) {
+      return
+    }
+
     switch (this.default) {
       case 'profile':
         this.src = this.DEFAULT_PROFILE_IMG

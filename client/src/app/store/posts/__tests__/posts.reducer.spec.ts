@@ -1,12 +1,12 @@
 import { Post } from '../../../utils/post.interface'
 import { postsReducer } from '../posts.reducer'
-import { initialState, postsAdapter } from '../posts.state'
+import { initialState, postsAdapter, PostsState } from '../posts.state'
 import * as PostsActions from '../posts.actions'
 
 describe('Posts Reducer', () => {
   const mockPosts = [
-    { id: '1', body: 'test', createdAt: new Date() } as Post,
-    { id: '2', body: 'test', createdAt: new Date() } as Post,
+    { id: '1', body: 'test', createdAt: new Date().toISOString() } as Post,
+    { id: '2', body: 'test', createdAt: new Date().toISOString() } as Post,
   ]
   const mockPost = {
     id: '3',
@@ -27,7 +27,7 @@ describe('Posts Reducer', () => {
     it('should set loading to true on loadPosts', () => {
       const state = postsReducer(initialState, PostsActions.loadPosts())
 
-      expect(state.loading).toEqual(true)
+      expect(state.postsLoading).toEqual(true)
     })
 
     it('should populate posts on loadPostsSuccess', () => {
@@ -50,7 +50,7 @@ describe('Posts Reducer', () => {
         PostsActions.loadPostsFailure({ error: 'Test Error' })
       )
 
-      expect(state.loading).toEqual(false)
+      expect(state.postsLoading).toEqual(false)
       expect(state.error).toEqual('Test Error')
     })
   })
@@ -64,7 +64,7 @@ describe('Posts Reducer', () => {
 
       const expectedState = postsAdapter.addOne(mockPost, initialState)
 
-      expect(state.loading).toEqual(false)
+      expect(state.postsLoading).toEqual(false)
       expect(state).toEqual(expectedState)
     })
 
@@ -91,6 +91,110 @@ describe('Posts Reducer', () => {
       postsAdapter.addOne(tmpPost, state)
 
       const expectedState = postsAdapter.removeOne('tmp-5', state)
+
+      expect(state).toEqual(expectedState)
+    })
+  })
+
+  describe('loadCurrentPost', () => {
+    it('should set current post on loadCurrentPostSuccess', () => {
+      const state = postsReducer(
+        initialState,
+        PostsActions.loadCurrentPostSuccess({ post: mockPost })
+      )
+
+      expect(state.currentPostId).toEqual(mockPost.id)
+    })
+
+    it('should set current post to null on clearCurrentPost', () => {
+      const state = postsReducer(initialState, PostsActions.clearCurrentPost())
+
+      expect(state.currentPostId).toEqual(null)
+    })
+  })
+
+  describe('deletePost', () => {
+    it('should delete post on deletePost', () => {
+      const stateWithPost: PostsState = postsAdapter.setAll([mockPost], {
+        ...initialState,
+        currentPost: mockPost,
+      })
+
+      const state = postsReducer(
+        stateWithPost,
+        PostsActions.deletePost({ post: mockPost })
+      )
+
+      expect(state.entities[mockPost.id]).toBeUndefined()
+      expect(postsAdapter.getSelectors().selectIds(state)).not.toContain(
+        mockPost.id
+      )
+      expect(state.currentPostId).toEqual(null)
+    })
+
+    it('should add post back on deletePostFailure', () => {
+      const state = postsReducer(
+        initialState,
+        PostsActions.deletePostFailure({ error: 'test error', post: mockPost })
+      )
+
+      const expectedState = postsAdapter.addOne(mockPost, initialState)
+
+      expect(state).toEqual(expectedState)
+    })
+  })
+
+  describe('editPost', () => {
+    it('should update post on editPost', () => {
+      const stateWithPost = postsAdapter.addOne(mockPost, initialState)
+      const state = postsReducer(
+        stateWithPost,
+        PostsActions.editPost({ id: '1', body: 'test2', prevBody: 'test' })
+      )
+
+      const expectedState = postsAdapter.updateOne(
+        { id: '1', changes: { body: 'test2' } },
+        stateWithPost
+      )
+
+      expect(state).toEqual(expectedState)
+    })
+
+    it('should update post on editPostSuccess', () => {
+      const stateWithPost = postsAdapter.addOne(mockPost, initialState)
+
+      const updatedPost = { ...mockPost, body: 'test3' }
+
+      const state = postsReducer(
+        stateWithPost,
+        PostsActions.editPostSuccess({ post: updatedPost })
+      )
+
+      const expectedState = postsAdapter.updateOne(
+        { id: updatedPost.id, changes: updatedPost },
+        stateWithPost
+      )
+
+      expect(state).toEqual(expectedState)
+    })
+
+    it('should rollback post body on editPostFailure', () => {
+      const updatedPost = { ...mockPost, body: 'test3' }
+      const stateWithPost = postsAdapter.addOne(updatedPost, initialState)
+
+      const state = postsReducer(
+        stateWithPost,
+        PostsActions.editPostFailure({
+          error: 'test error',
+          id: '3',
+          prevBody: 'test',
+        })
+      )
+
+      const expectedState = postsAdapter.updateOne(
+        { id: updatedPost.id, changes: mockPost },
+        stateWithPost
+      )
 
       expect(state).toEqual(expectedState)
     })

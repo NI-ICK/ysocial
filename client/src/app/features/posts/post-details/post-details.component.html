@@ -1,0 +1,48 @@
+<div class="container">
+  <div class="post" *ngIf="post$ | async as post">
+    <div class="details">
+      <div class="user" [routerLink]="['/', post.user.username]">
+        <img [src]="post.user.imagePath" default="profile" />
+        <p>{{ post.user.username }}</p>
+      </div>
+      <ng-container *ngIf="currentUser$ | async as currentUser">
+        <span
+          *ngIf="currentUser?.id === post.user.id"
+          (click)="$event.stopPropagation(); showOptions()"
+        ></span>
+      </ng-container>
+      <div *ngIf="optionsVisible" class="menu" (clickOutside)="closeOptions()">
+        <p (click)="showEdit()">Edit Post</p>
+        <p (click)="showConfirmation()">Delete Post</p>
+      </div>
+    </div>
+    <div class="content">
+      <p class="body">{{ post.body }}</p>
+      <p class="edited" *ngIf="post.createdAt !== post.updatedAt">(edited)</p>
+      <img *ngIf="post.image" [src]="post.image" default="post" />
+    </div>
+    <p class="date">
+      {{ formatDate(post.createdAt) }}
+    </p>
+  </div>
+</div>
+
+<modal-wrapper *ngIf="editVisible" (close)="closeEdit()">
+  <form [formGroup]="editForm" (ngSubmit)="editPost()">
+    <h2>Edit post</h2>
+    <div class="field">
+      <textarea #textarea formControlName="body"></textarea>
+    </div>
+    <button type="submit">Edit</button>
+  </form>
+</modal-wrapper>
+
+<modal-wrapper *ngIf="confirmationVisible" (close)="closeConfirmation()">
+  <div class="confirmation">
+    <p>Do you really want to delete this post?</p>
+    <div>
+      <button (click)="closeConfirmation()">Close</button>
+      <button (click)="deletePost()">Delete</button>
+    </div>
+  </div>
+</modal-wrapper>

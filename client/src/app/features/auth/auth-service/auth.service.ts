@@ -7,6 +7,7 @@ import {
   REGISTER_USER,
 } from '../../../graphql/auth.operations'
 import { User } from '../../../utils/user.interface'
+import { tap } from 'rxjs'
 
 @Injectable({
   providedIn: 'root',
@@ -42,8 +43,14 @@ export class AuthService {
   }
 
   logoutUser() {
-    return this.apollo.mutate({
-      mutation: LOGOUT_USER,
-    })
+    return this.apollo
+      .mutate({
+        mutation: LOGOUT_USER,
+      })
+      .pipe(
+        tap(() => {
+          this.apollo.client.clearStore()
+        })
+      )
   }
 }

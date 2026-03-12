@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-
 import { ModalWrapperComponent } from './modal-wrapper.component'
 import { By } from '@angular/platform-browser'
 

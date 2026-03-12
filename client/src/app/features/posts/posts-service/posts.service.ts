@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core'
-import { CREATE_POST, GET_ALL_POSTS } from '../../../graphql/post.operations'
+import {
+  CREATE_POST,
+  DELETE_POST,
+  EDIT_POST,
+  GET_ALL_POSTS,
+  GET_POST_BY_ID,
+} from '../../../graphql/post.operations'
 import { Post } from '../../../utils/post.interface'
 import { Apollo } from 'apollo-angular'
 
@@ -9,6 +15,21 @@ interface GetAllPostsResponse {
 
 interface CreatePostResponse {
   createPost: Post
+}
+
+interface GetPostByIdResponse {
+  getPostById: Post
+}
+
+interface DeletePostResponse {
+  deletePost: {
+    success: boolean
+    message: string
+  }
+}
+
+interface EditPostResponse {
+  editPost: Post
 }
 
 @Injectable({
@@ -23,10 +44,31 @@ export class PostsService {
     })
   }
 
+  getPostById(id: string) {
+    return this.apollo.query<GetPostByIdResponse>({
+      query: GET_POST_BY_ID,
+      variables: { id },
+    })
+  }
+
   createPost(userId: string, body: string | null, file: File | null) {
     return this.apollo.mutate<CreatePostResponse>({
       mutation: CREATE_POST,
       variables: { userId, body, image: file },
+    })
+  }
+
+  deletePost(id: string) {
+    return this.apollo.mutate<DeletePostResponse>({
+      mutation: DELETE_POST,
+      variables: { id },
+    })
+  }
+
+  editPost(id: string, body: string) {
+    return this.apollo.mutate<EditPostResponse>({
+      mutation: EDIT_POST,
+      variables: { id, body },
     })
   }
 }

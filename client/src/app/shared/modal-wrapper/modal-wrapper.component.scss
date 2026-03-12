@@ -8,12 +8,6 @@
   inset: 0;
   background-color: rgba($background-2, 0.3);
   z-index: 200;
-
-  &.side {
-    align-items: start;
-    justify-content: end;
-    margin: 3.5em 1em;
-  }
 }
 
 .content {

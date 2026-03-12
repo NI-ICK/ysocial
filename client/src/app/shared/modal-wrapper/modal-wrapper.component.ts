@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter, Input } from '@angular/core'
+import { Component, Output, EventEmitter } from '@angular/core'
 
 @Component({
   selector: 'modal-wrapper',
@@ -7,8 +7,6 @@ import { Component, Output, EventEmitter, Input } from '@angular/core'
   styleUrl: './modal-wrapper.component.scss',
 })
 export class ModalWrapperComponent {
-  @Input() backgroundVisible = true
-  @Input() position: 'center' | 'side' = 'center'
   @Output() close = new EventEmitter()
 
   closeModal() {

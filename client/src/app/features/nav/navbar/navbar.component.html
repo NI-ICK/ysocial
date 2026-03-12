@@ -26,11 +26,8 @@
   <register-form (registerSuccess)="closeRegisterModal()"></register-form>
 </modal-wrapper>
 
-<modal-wrapper
+<user-menu
   *ngIf="showMenu"
-  (close)="closeMenu()"
-  [backgroundVisible]="false"
-  position="side"
->
-  <user-menu (closeMenu)="closeMenu()"></user-menu>
-</modal-wrapper>
+  (closeMenu)="closeMenu()"
+  (clickOutside)="closeMenu()"
+></user-menu>

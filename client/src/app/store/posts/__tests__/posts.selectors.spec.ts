@@ -8,12 +8,12 @@ describe('Posts Selectors', () => {
     { id: '2', body: 'test' } as Post,
   ]
 
-  const mockState: PostsState = postsAdapter.setAll(mockPosts, {
-    ids: [],
-    entities: {},
-    loading: false,
+  const mockState: PostsState = {
+    ...postsAdapter.setAll(mockPosts, postsAdapter.getInitialState()),
+    currentPostId: '1',
+    postsLoading: false,
     error: null,
-  })
+  }
   const appState = { posts: mockState }
 
   it('should select posts feature state', () => {
@@ -31,11 +31,29 @@ describe('Posts Selectors', () => {
   it('should select loading state', () => {
     const loadingState = {
       ...mockState,
-      loading: true,
+      postsLoading: true,
     }
 
     const result = PostsSelectors.selectPostsLoading({ posts: loadingState })
 
     expect(result).toEqual(true)
+  })
+
+  it('should select current post', () => {
+    const result = PostsSelectors.selectCurrentPost(appState)
+
+    expect(result).toEqual(mockPosts[0])
+  })
+
+  it('should select current post id', () => {
+    const result = PostsSelectors.selectCurrentPostId(appState)
+
+    expect(result).toEqual('1')
+  })
+
+  it('should select post by id', () => {
+    const result = PostsSelectors.selectPostById('1')(appState)
+
+    expect(result).toEqual(mockPosts[0])
   })
 })

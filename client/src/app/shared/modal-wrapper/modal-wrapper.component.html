@@ -1,9 +1,4 @@
-<div
-  class="backdrop"
-  [class.side]="position === 'side'"
-  (click)="closeModal()"
-  [style.background-color]="backgroundVisible ? '' : 'transparent'"
->
+<div class="backdrop" (click)="closeModal()">
   <div class="content" (click)="$event.stopPropagation()">
     <ng-content></ng-content>
   </div>
