@@ -28,10 +28,11 @@ describe('AuthService', () => {
     expect(apolloController).toBeTruthy()
   })
 
-  it('should login user', () => {
+  it('should login user', (done) => {
     authService.loginUser('test@gmail.com', 'test').subscribe((result: any) => {
       expect(result.data.loginUser.id).toEqual('1')
       expect(result.data.loginUser.email).toEqual('test@gmail.com')
+      done()
     })
 
     const op = apolloController.expectOne(LOGIN_USER)
@@ -39,12 +40,13 @@ describe('AuthService', () => {
     apolloController.verify()
   })
 
-  it('should register user', () => {
+  it('should register user', (done) => {
     authService
       .registerUser('test', 'test@gmail.com', 'test')
       .subscribe((result: any) => {
-        expect(result.data.register.id).toEqual('1')
-        expect(result.data.register.email).toEqual('test@gmail.com')
+        expect(result.data.registerUser.id).toEqual('1')
+        expect(result.data.registerUser.email).toEqual('test@gmail.com')
+        done()
       })
 
     const op = apolloController.expectOne(REGISTER_USER)
@@ -52,10 +54,11 @@ describe('AuthService', () => {
     apolloController.verify()
   })
 
-  it('should get current user', () => {
+  it('should get current user', (done) => {
     authService.getCurrentUser().subscribe((result: any) => {
       expect(result.data.getCurrentUser.id).toEqual('1')
       expect(result.data.getCurrentUser.email).toEqual('test@gmail.com')
+      done()
     })
 
     const op = apolloController.expectOne(GET_CURRENT_USER)
@@ -63,9 +66,10 @@ describe('AuthService', () => {
     apolloController.verify()
   })
 
-  it('should logout user', () => {
+  it('should logout user', (done) => {
     authService.logoutUser().subscribe((result: any) => {
-      expect(result.data.loginUser.success).toEqual(true)
+      expect(result.data.logoutUser.success).toEqual(true)
+      done()
     })
 
     const op = apolloController.expectOne(LOGOUT_USER)

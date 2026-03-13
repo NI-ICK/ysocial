@@ -1,4 +1,4 @@
-import { Observable, of, take, throwError } from 'rxjs'
+import { Observable, of, take, throwError, toArray } from 'rxjs'
 import { PostsEffects } from '../posts.effects'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { PopupService } from '../../../shared/popup/popup.service'
@@ -9,9 +9,10 @@ import { PostsService } from '../../../features/posts/posts-service/posts.servic
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { selectCurrentUser } from '../../auth/auth.selectors'
 import { User } from '../../../utils/user.interface'
+import { Actions } from '@ngrx/effects'
 
 describe('Posts Effects', () => {
-  let actions$: Observable<any>
+  let actions$: Actions
   let effects: PostsEffects
   let store: MockStore
   let popupService: Partial<PopupService>
@@ -50,9 +51,9 @@ describe('Posts Effects', () => {
   })
 
   describe('loadPosts', () => {
-    it('should dispatch loadPostsSuccess when postsService.getAllPosts succeeds', () => {
+    it('should dispatch loadPostsSuccess when postsService.getAllPosts succeeds', (done) => {
       ;(postsService.getAllPosts as jest.Mock).mockReturnValue(
-        of({ getAllPosts: [postMock] })
+        of({ data: { getAllPosts: [postMock] } })
       )
 
       actions$ = of(PostsActions.loadPosts())
@@ -61,10 +62,11 @@ describe('Posts Effects', () => {
         expect(action).toEqual(
           PostsActions.loadPostsSuccess({ posts: [postMock] })
         )
+        done()
       })
     })
 
-    it('should dispatch loadPostsFailure when postsService.getAllPosts fails', () => {
+    it('should dispatch loadPostsFailure when postsService.getAllPosts fails', (done) => {
       ;(postsService.getAllPosts as jest.Mock).mockReturnValue(
         throwError(() => new Error('test error'))
       )
@@ -74,14 +76,17 @@ describe('Posts Effects', () => {
         expect(action).toEqual(
           PostsActions.loadPostsFailure({ error: 'test error' })
         )
+        done()
       })
     })
   })
 
   describe('createPost', () => {
-    it('should dispatch createPostSuccess and and replaceOptimisticPost then call popupService when postsService.createPost succeeds', () => {
+    it('should dispatch createPostSuccess and and replaceOptimisticPost then call popupService when postsService.createPost succeeds', (done) => {
       store.overrideSelector(selectCurrentUser, { id: '1' } as User)
-      ;(postsService.createPost as jest.Mock).mockReturnValue(postMock)
+      ;(postsService.createPost as jest.Mock).mockReturnValue(
+        of({ data: { createPost: postMock } })
+      )
 
       actions$ = of(
         PostsActions.createPost({
@@ -90,23 +95,38 @@ describe('Posts Effects', () => {
         })
       )
 
-      const { id: _, ...postMocktWithoutId } = postMock
+      effects.createPost$.pipe(toArray()).subscribe((actions) => {
+        const optimistic = actions[0] as ReturnType<
+          typeof PostsActions.createPostSuccess
+        >
+        const replace = actions[1] as ReturnType<
+          typeof PostsActions.removeOptimisticPost
+        >
 
-      effects.createPost$.subscribe((actions) => {
-        expect(actions).toEqual([
-          PostsActions.createPostSuccess({
-            post: { id: 'tmp-1', ...postMocktWithoutId },
-          }),
+        expect(optimistic.type).toEqual('[Posts] Create Post Success')
+        expect(optimistic.post).toEqual(
+          expect.objectContaining({
+            body: 'test',
+            image: null,
+            id: expect.stringMatching(/^tmp-/),
+          })
+        )
+
+        expect(replace.type).toEqual('[Posts] Replace Optimistic Post')
+        expect(replace).toEqual(
           PostsActions.replaceOptimisticPost({
-            tmpId: 'tmp-1',
+            tmpId: optimistic.post.id,
             post: postMock,
-          }),
-        ])
+          })
+        )
+
         expect(popupService.showPopup).toHaveBeenCalled()
+
+        done()
       })
     })
 
-    it('should dispatch createPostFailure and removeOptimisticPost when postsService.createPost fails', () => {
+    it('should dispatch createPostFailure and removeOptimisticPost when postsService.createPost fails', (done) => {
       store.overrideSelector(selectCurrentUser, { id: '1' } as User)
       ;(postsService.createPost as jest.Mock).mockReturnValue(
         throwError(() => new Error('test error'))
@@ -119,15 +139,32 @@ describe('Posts Effects', () => {
         })
       )
 
-      effects.createPost$.subscribe((actions) => {
-        expect(actions).toEqual([
-          PostsActions.removeOptimisticPost({ tmpId: 'tmp-1' }),
-          PostsActions.createPostFailure({ error: 'test error' }),
-        ])
+      effects.createPost$.pipe(toArray()).subscribe((actions) => {
+        const optimistic = actions[0] as ReturnType<
+          typeof PostsActions.createPostSuccess
+        >
+        const remove = actions[1] as ReturnType<
+          typeof PostsActions.removeOptimisticPost
+        >
+        const create = actions[2] as ReturnType<
+          typeof PostsActions.createPostFailure
+        >
+
+        expect(optimistic.type).toEqual('[Posts] Create Post Success')
+        expect(optimistic.post.body).toEqual('test')
+        expect(optimistic.post.image).toEqual(null)
+
+        expect(remove.type).toEqual('[Posts] Remove Optimistic Post')
+        expect(remove.tmpId).toMatch(/^tmp-/)
+
+        expect(create.type).toEqual('[Posts] Create Post Failure')
+        expect(create.error).toEqual('test error')
+
+        done()
       })
     })
 
-    it('should dispatch createPostFailure if no user logged in', () => {
+    it('should dispatch createPostFailure if no user logged in', (done) => {
       store.overrideSelector(selectCurrentUser, null)
 
       actions$ = of(PostsActions.createPost({ body: 'test', file: null }))
@@ -136,6 +173,7 @@ describe('Posts Effects', () => {
         expect(action).toEqual(
           PostsActions.createPostFailure({ error: 'No user logged in' })
         )
+        done()
       })
     })
   })

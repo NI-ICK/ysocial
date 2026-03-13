@@ -8,13 +8,13 @@ import { PopupService } from '../../shared/popup/popup.service'
 @Injectable()
 export class AuthEffects {
   constructor(
-    private action$: Actions,
+    private actions$: Actions,
     private authService: AuthService,
     private popupService: PopupService
   ) {}
 
   loginUser$ = createEffect(() =>
-    this.action$.pipe(
+    this.actions$.pipe(
       ofType(AuthActions.loginUser),
       switchMap(({ email, password }) =>
         this.authService.loginUser(email, password).pipe(
@@ -32,7 +32,7 @@ export class AuthEffects {
 
   loginUserSuccess$ = createEffect(
     () =>
-      this.action$.pipe(
+      this.actions$.pipe(
         ofType(AuthActions.loginUserSuccess),
         tap(() => this.popupService.showPopup('Sign In Successfull'))
       ),
@@ -41,7 +41,7 @@ export class AuthEffects {
 
   loginUserFailure$ = createEffect(
     () =>
-      this.action$.pipe(
+      this.actions$.pipe(
         ofType(AuthActions.loginUserFailure),
         tap(({ error }) =>
           this.popupService.showPopup(error || 'Sign In Failed')
@@ -51,7 +51,7 @@ export class AuthEffects {
   )
 
   registerUser$ = createEffect(() =>
-    this.action$.pipe(
+    this.actions$.pipe(
       ofType(AuthActions.registerUser),
       switchMap(({ username, email, password }) =>
         this.authService.registerUser(username, email, password).pipe(
@@ -66,7 +66,7 @@ export class AuthEffects {
 
   registerUserSuccess$ = createEffect(
     () =>
-      this.action$.pipe(
+      this.actions$.pipe(
         ofType(AuthActions.registerUserSuccess),
         tap(() => this.popupService.showPopup('Sign Up Successfull'))
       ),
@@ -75,7 +75,7 @@ export class AuthEffects {
 
   registerUserFailure$ = createEffect(
     () =>
-      this.action$.pipe(
+      this.actions$.pipe(
         ofType(AuthActions.registerUserFailure),
         tap(({ error }) =>
           this.popupService.showPopup(error || 'Sign Up Failed')
@@ -85,7 +85,7 @@ export class AuthEffects {
   )
 
   loadUser$ = createEffect(() =>
-    this.action$.pipe(
+    this.actions$.pipe(
       ofType(AuthActions.loadUser),
       switchMap(() =>
         this.authService.getCurrentUser().pipe(
@@ -103,7 +103,7 @@ export class AuthEffects {
   )
 
   logoutUser$ = createEffect(() =>
-    this.action$.pipe(
+    this.actions$.pipe(
       ofType(AuthActions.logoutUser),
       switchMap(() =>
         this.authService.logoutUser().pipe(

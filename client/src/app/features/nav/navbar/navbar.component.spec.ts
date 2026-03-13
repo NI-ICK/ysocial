@@ -106,15 +106,15 @@ describe('NavbarComponent', () => {
     component.openMenu()
     fixture.detectChanges()
 
-    let modal = fixture.debugElement.query(By.css('modal-wrapper'))
+    let menu = fixture.debugElement.query(By.css('user-menu'))
     expect(component.showMenu).toBe(true)
-    expect(modal).toBeTruthy()
+    expect(menu).toBeTruthy()
 
     component.closeMenu()
     fixture.detectChanges()
 
-    modal = fixture.debugElement.query(By.css('modal-wrapper'))
+    menu = fixture.debugElement.query(By.css('user-menu'))
     expect(component.showMenu).toBe(false)
-    expect(modal).toBeNull()
+    expect(menu).toBeNull()
   })
 })

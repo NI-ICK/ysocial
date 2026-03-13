@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { CreatePostFormComponent } from './create-post-form.component'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { createPost } from '../../../store/posts/posts.actions'
+import { selectCurrentUser } from '../../../store/auth/auth.selectors'
+import { User } from '../../../utils/user.interface'
 
 describe('CreatePostFormComponent', () => {
   let component: CreatePostFormComponent
@@ -18,16 +20,23 @@ describe('CreatePostFormComponent', () => {
     fixture = TestBed.createComponent(CreatePostFormComponent)
     component = fixture.componentInstance
     fixture.detectChanges()
+
+    store.overrideSelector(selectCurrentUser, {
+      id: '1',
+      username: 'test',
+    } as User)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
   })
 
-  it('should set currentUser on ngOnInit', () => {
+  it('should set currentUser on ngOnInit', (done) => {
     component.ngOnInit()
     component.currentUser$.subscribe((user) => {
-      expect(user).toEqual({ id: '1' })
+      expect(user?.id).toEqual('1')
+      expect(user?.username).toEqual('test')
+      done()
     })
   })
 
