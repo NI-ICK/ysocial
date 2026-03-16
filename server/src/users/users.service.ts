@@ -13,7 +13,12 @@ export class UsersService {
     return this.usersRepository.find()
   }
 
-  getUserBy(field: Partial<User>) {
+  getUserBy(
+    field: Pick<
+      Partial<User>,
+      'id' | 'email' | 'username' | 'provider' | 'providerId'
+    >,
+  ) {
     return this.usersRepository.findOne({ where: field })
   }
 

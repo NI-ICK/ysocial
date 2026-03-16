@@ -1,10 +1,12 @@
 import { Field, ObjectType } from '@nestjs/graphql'
+import { Comment } from 'src/comments/comments.entity'
 import { User } from 'src/users/user.entity'
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm'
@@ -39,4 +41,8 @@ export class Post {
   @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
   @Field(() => User)
   user: User
+
+  @OneToMany(() => Comment, (comment) => comment.post, { onDelete: 'CASCADE' })
+  @Field(() => Comment)
+  comments: Comment[]
 }

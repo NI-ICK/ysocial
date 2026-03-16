@@ -10,12 +10,24 @@ type Post {
   image: String
   imagePublicId: String
   user: User!
+  comments: Comment!
 }
 
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+type Comment {
+  id: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  body: String!
+  user: User!
+  post: Post!
+  parent: Comment
+  children: Comment!
+}
 
 type User {
   id: String!
@@ -26,6 +38,7 @@ type User {
   providerId: String
   imagePath: String
   posts: [Post!]
+  comments: [Comment!]
 }
 
 enum AuthProvider {
@@ -53,6 +66,10 @@ type DeletePostOutput {
   message: String!
 }
 
+type DeleteCommentOutput {
+  success: Boolean!
+}
+
 type Query {
   getCurrentUser: User!
   getAllUsers: [User!]!
@@ -67,6 +84,8 @@ type Mutation {
   createPost(createPostData: CreatePostInput!): Post!
   editPost(editPostData: EditPostInput!): Post!
   deletePost(id: String!): DeletePostOutput!
+  createComment(createCommentData: CreateCommentInput!): Comment!
+  deleteComment(id: String!): DeleteCommentOutput!
 }
 
 input LoginUserInput {
@@ -92,4 +111,11 @@ scalar Upload
 input EditPostInput {
   id: String!
   body: String!
+}
+
+input CreateCommentInput {
+  body: String!
+  userId: String!
+  postId: String!
+  parentId: String
 }

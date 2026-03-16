@@ -10,6 +10,8 @@ import { CloudinaryModule } from './cloudinary/cloudinary.module'
 import { graphqlUploadExpress } from 'graphql-upload-ts'
 import { Post } from './posts/post.entity'
 import { PostsModule } from './posts/posts.module'
+import { CommentsModule } from './comments/comments.module'
+import { Comment } from './comments/comments.entity'
 
 @Module({
   imports: [
@@ -29,12 +31,13 @@ import { PostsModule } from './posts/posts.module'
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [User, Post],
+      entities: [User, Post, Comment],
       synchronize: process.env.TYPEORM_SYNC as boolean | undefined,
     }),
     AuthModule,
     UsersModule,
     PostsModule,
+    CommentsModule,
     CloudinaryModule,
   ],
   controllers: [],

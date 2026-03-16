@@ -1,4 +1,5 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql'
+import { Comment } from 'src/comments/comments.entity'
 import { Post } from 'src/posts/post.entity'
 import { AuthProvider } from 'src/utils/auth-provider.enum'
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
@@ -39,4 +40,8 @@ export class User {
   @OneToMany(() => Post, (post) => post.user, { cascade: true })
   @Field(() => [Post], { nullable: true })
   posts?: Post[]
+
+  @OneToMany(() => Comment, (comment) => comment.user, { cascade: true })
+  @Field(() => [Comment], { nullable: true })
+  comments?: Comment[]
 }
