@@ -4,11 +4,19 @@ import { CommentsService } from '../comments.service'
 import { Comment } from '../comments.entity'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { User } from 'src/users/user.entity'
+import { CommentLikesService } from 'src/comment-likes/comment-likes.service'
 
 describe('CommentsResolver', () => {
   let resolver: CommentsResolver
   let commentsService: Partial<CommentsService>
   let commentsRepository: Partial<Repository<Comment>>
+  let commentLikesService: Partial<CommentLikesService>
+
+  const mockUser = {
+    id: '1',
+    username: 'test',
+  } as User
 
   const mockComment = {
     id: '1',
@@ -21,11 +29,16 @@ describe('CommentsResolver', () => {
       createComment: jest.fn(),
       deleteComment: jest.fn(),
     }
+    commentLikesService = {
+      getLikesCountByCommentId: jest.fn(),
+      isCommentLikedByUser: jest.fn(),
+    }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommentsResolver,
         { provide: CommentsService, useValue: commentsService },
+        { provide: CommentLikesService, useValue: commentLikesService },
         { provide: getRepositoryToken(Comment), useValue: commentsRepository },
       ],
     }).compile()
@@ -45,7 +58,7 @@ describe('CommentsResolver', () => {
 
       const input = { body: 'test', userId: '1', postId: '2', parentId: null }
 
-      const result = await resolver.createComment(input)
+      const result = await resolver.createComment(input, mockUser)
 
       expect(result).toEqual(mockComment)
     })
@@ -57,6 +70,41 @@ describe('CommentsResolver', () => {
 
       expect(result).toEqual({ success: true })
       expect(commentsService.deleteComment).toHaveBeenCalled()
+    })
+  })
+
+  describe('@ResolveField', () => {
+    describe('likesCount', () => {
+      it('should call call service and return resonse', () => {
+        ;(
+          commentLikesService.getLikesCountByCommentId as jest.Mock
+        ).mockReturnValue(2)
+
+        const result = resolver.likesCount({ id: '1' } as Comment)
+
+        expect(result).toEqual(2)
+      })
+    })
+
+    describe('likedByMe', () => {
+      it('should return false if user is not provided', () => {
+        const result = resolver.likedByMe({ id: '1' } as Comment, null)
+
+        expect(result).toEqual(false)
+      })
+
+      it('should call call service and return resonse', () => {
+        ;(
+          commentLikesService.isCommentLikedByUser as jest.Mock
+        ).mockReturnValue(true)
+
+        const result = resolver.likedByMe(
+          { id: '1' } as Comment,
+          { id: '1' } as User,
+        )
+
+        expect(result).toEqual(true)
+      })
     })
   })
 })

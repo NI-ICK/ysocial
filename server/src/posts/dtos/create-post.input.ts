@@ -8,7 +8,4 @@ export class CreatePostInput {
 
   @Field(() => GraphQLUpload, { nullable: true })
   image?: Promise<FileUpload>
-
-  @Field()
-  userId: string
 }

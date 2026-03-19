@@ -1,5 +1,6 @@
 import { Field, ObjectType } from '@nestjs/graphql'
 import { Comment } from 'src/comments/comments.entity'
+import { PostLike } from 'src/post-likes/post-likes.entity'
 import { User } from 'src/users/user.entity'
 import {
   Column,
@@ -43,6 +44,10 @@ export class Post {
   user: User
 
   @OneToMany(() => Comment, (comment) => comment.post, { onDelete: 'CASCADE' })
-  @Field(() => Comment)
-  comments: Comment[]
+  @Field(() => [Comment], { nullable: true })
+  comments?: Comment[]
+
+  @OneToMany(() => PostLike, (like) => like.post, { onDelete: 'CASCADE' })
+  @Field(() => [PostLike], { nullable: true })
+  likes: PostLike[]
 }

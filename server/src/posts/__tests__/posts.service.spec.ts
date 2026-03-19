@@ -3,22 +3,23 @@ import { PostsService } from '../posts.service'
 import { Post } from '../post.entity'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
-import { UsersService } from 'src/users/users.service'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
 import { FileUpload } from 'graphql-upload-ts'
 import { CreatePostInput } from '../dtos/create-post.input'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
+import { User } from 'src/users/user.entity'
 
 describe('PostsService', () => {
   let postsService: PostsService
   let postsRepository: Partial<Repository<Post>>
-  let usersService: Partial<UsersService>
   let cloudinaryService: Partial<CloudinaryService>
 
+  const mockUser = {
+    id: '1',
+    username: 'test',
+  } as User
+
   beforeEach(async () => {
-    usersService = {
-      getUserBy: jest.fn(),
-    }
     postsRepository = {
       create: jest.fn(),
       save: jest.fn(),
@@ -35,7 +36,6 @@ describe('PostsService', () => {
       providers: [
         PostsService,
         { provide: getRepositoryToken(Post), useValue: postsRepository },
-        { provide: UsersService, useValue: usersService },
         { provide: CloudinaryService, useValue: cloudinaryService },
       ],
     }).compile()
@@ -52,13 +52,11 @@ describe('PostsService', () => {
       const input = { body: 'test', userId: '1' }
       const mockPost = { id: '1', body: 'test', image: '' }
 
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue({ id: '1' })
       ;(postsRepository.create as jest.Mock).mockResolvedValue(mockPost)
 
-      const result = await postsService.createPost(input)
+      const result = await postsService.createPost(input, mockUser)
 
       expect(result).toEqual(mockPost)
-      expect(usersService.getUserBy).toHaveBeenCalledWith({ id: '1' })
       expect(postsRepository.create).toHaveBeenCalled()
       expect(postsRepository.save).toHaveBeenCalled()
       expect(result.image).toEqual('')
@@ -83,13 +81,14 @@ describe('PostsService', () => {
         secure_url: 'testPath',
         public_id: '123 ',
       })
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue({ id: '1' })
       ;(postsRepository.create as jest.Mock).mockResolvedValue(mockPost)
 
-      const result = await postsService.createPost(input as CreatePostInput)
+      const result = await postsService.createPost(
+        input as CreatePostInput,
+        mockUser,
+      )
 
       expect(result).toEqual(mockPost)
-      expect(usersService.getUserBy).toHaveBeenCalledWith({ id: '1' })
       expect(cloudinaryService.uploadFile).toHaveBeenCalled()
       expect(postsRepository.create).toHaveBeenCalled()
       expect(postsRepository.save).toHaveBeenCalled()
@@ -98,17 +97,9 @@ describe('PostsService', () => {
     })
 
     it('should throw BadRequestException if body and image are missing', async () => {
-      await expect(postsService.createPost({ userId: '1' })).rejects.toThrow(
-        BadRequestException,
-      )
-    })
-
-    it('should throw NotFoundException if user is not found', async () => {
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue(null)
-
       await expect(
-        postsService.createPost({ body: 'test', userId: '1' }),
-      ).rejects.toThrow(NotFoundException)
+        postsService.createPost({ body: '' }, mockUser),
+      ).rejects.toThrow(BadRequestException)
     })
   })
 

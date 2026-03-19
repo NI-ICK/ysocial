@@ -2,6 +2,20 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type CommentLike {
+  userId: String!
+  commentId: String!
+  user: User!
+  comment: Comment!
+}
+
+type PostLike {
+  userId: String!
+  postId: String!
+  user: User!
+  post: Post!
+}
+
 type Post {
   id: String!
   createdAt: DateTime!
@@ -10,7 +24,10 @@ type Post {
   image: String
   imagePublicId: String
   user: User!
-  comments: Comment!
+  comments: [Comment!]
+  likes: [PostLike!]
+  likesCount: Float!
+  likedByMe: Boolean!
 }
 
 """
@@ -26,7 +43,10 @@ type Comment {
   user: User!
   post: Post!
   parent: Comment
-  children: Comment!
+  children: [Comment!]
+  likes: [CommentLike!]!
+  likesCount: Float!
+  likedByMe: Boolean!
 }
 
 type User {
@@ -39,6 +59,8 @@ type User {
   imagePath: String
   posts: [Post!]
   comments: [Comment!]
+  commentLikes: [CommentLike!]
+  postLikes: [PostLike!]
 }
 
 enum AuthProvider {
@@ -66,6 +88,10 @@ type DeletePostOutput {
   message: String!
 }
 
+type ToggleLikeOutput {
+  addLike: Boolean!
+}
+
 type DeleteCommentOutput {
   success: Boolean!
 }
@@ -84,8 +110,10 @@ type Mutation {
   createPost(createPostData: CreatePostInput!): Post!
   editPost(editPostData: EditPostInput!): Post!
   deletePost(id: String!): DeletePostOutput!
+  togglePostLike(postId: String!): ToggleLikeOutput!
   createComment(createCommentData: CreateCommentInput!): Comment!
   deleteComment(id: String!): DeleteCommentOutput!
+  toggleCommentLike(commentId: String!): ToggleLikeOutput!
 }
 
 input LoginUserInput {
@@ -102,7 +130,6 @@ input RegisterUserInput {
 input CreatePostInput {
   body: String
   image: Upload
-  userId: String!
 }
 
 """The `Upload` scalar type represents a file upload."""
@@ -115,7 +142,6 @@ input EditPostInput {
 
 input CreateCommentInput {
   body: String!
-  userId: String!
   postId: String!
   parentId: String
 }

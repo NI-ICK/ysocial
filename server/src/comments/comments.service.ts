@@ -8,19 +8,18 @@ import { Comment } from './comments.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { randomUUID } from 'crypto'
-import { UsersService } from 'src/users/users.service'
-import { PostsService } from 'src/posts/posts.service'
+import { User } from 'src/users/user.entity'
+import { Post } from 'src/posts/post.entity'
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectRepository(Comment) private commentsRepository: Repository<Comment>,
-    private usersService: UsersService,
-    private postsService: PostsService,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
-  async createComment(data: CreateCommentInput) {
-    const { parentId, userId, postId, body } = data
+  async createComment(data: CreateCommentInput, user: User) {
+    const { parentId, postId, body } = data
 
     if (!body) throw new BadRequestException('Message is required')
 
@@ -33,10 +32,7 @@ export class CommentsService {
       if (!parent) throw new NotFoundException('Parent Comment not found')
     }
 
-    const user = await this.usersService.getUserBy({ id: userId })
-    if (!user) throw new NotFoundException('User not found')
-
-    const post = await this.postsService.getPostById(postId)
+    const post = await this.postsRepository.findOne({ where: { id: postId } })
     if (!post) throw new NotFoundException('Post not found')
 
     const comment = this.commentsRepository.create({
@@ -67,5 +63,13 @@ export class CommentsService {
     if (!comment) throw new NotFoundException('Comment not found')
 
     await this.commentsRepository.delete(id)
+  }
+
+  async getCommentsByPostId(postId: string) {
+    const comments = await this.commentsRepository.find({
+      where: { post: { id: postId } },
+    })
+
+    return comments
   }
 }

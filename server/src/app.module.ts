@@ -12,6 +12,10 @@ import { Post } from './posts/post.entity'
 import { PostsModule } from './posts/posts.module'
 import { CommentsModule } from './comments/comments.module'
 import { Comment } from './comments/comments.entity'
+import { CommentLikesModule } from './comment-likes/comment-likes.module'
+import { PostLikesModule } from './post-likes/post-likes.module'
+import { PostLike } from './post-likes/post-likes.entity'
+import { CommentLike } from './comment-likes/comment-likes.entity'
 
 @Module({
   imports: [
@@ -31,7 +35,7 @@ import { Comment } from './comments/comments.entity'
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: process.env.DATABASE_URL,
-      entities: [User, Post, Comment],
+      entities: [User, Post, Comment, PostLike, CommentLike],
       synchronize: process.env.TYPEORM_SYNC as boolean | undefined,
     }),
     AuthModule,
@@ -39,6 +43,8 @@ import { Comment } from './comments/comments.entity'
     PostsModule,
     CommentsModule,
     CloudinaryModule,
+    CommentLikesModule,
+    PostLikesModule,
   ],
   controllers: [],
   providers: [],

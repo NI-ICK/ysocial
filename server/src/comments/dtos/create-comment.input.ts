@@ -6,9 +6,6 @@ export class CreateCommentInput {
   body: string
 
   @Field()
-  userId: string
-
-  @Field()
   postId: string
 
   @Field(() => String, { nullable: true })

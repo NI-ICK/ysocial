@@ -47,6 +47,8 @@ export class AuthService {
       provider,
       providerId,
       imagePath,
+      postLikes: [],
+      commentLikes: [],
     })
     return newUser
   }
@@ -80,6 +82,8 @@ export class AuthService {
       password: hashedPassword,
       provider: AuthProvider.LOCAL,
       imagePath: DEFAULT_IMAGE_PATH,
+      postLikes: [],
+      commentLikes: [],
     })
     const { password: _, ...result } = newUser
     return result

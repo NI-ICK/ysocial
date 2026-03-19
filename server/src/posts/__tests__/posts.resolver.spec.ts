@@ -4,11 +4,21 @@ import { PostsService } from '../posts.service'
 import { Post } from '../post.entity'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { User } from 'src/users/user.entity'
+import { PostLikesService } from 'src/post-likes/post-likes.service'
+import { CommentsService } from 'src/comments/comments.service'
 
 describe('PostsResolver', () => {
   let resolver: PostsResolver
   let service: Partial<PostsService>
   let postsRepository: Partial<Repository<Post>>
+  let postLikesService: Partial<PostLikesService>
+  let commentsService: Partial<CommentsService>
+
+  const mockUser = {
+    id: '1',
+    username: 'test',
+  } as User
 
   beforeEach(async () => {
     service = {
@@ -18,11 +28,20 @@ describe('PostsResolver', () => {
       getAllPosts: jest.fn(),
       deletePost: jest.fn(),
     }
+    postLikesService = {
+      getLikesCountByPostId: jest.fn(),
+      isPostLikedByUser: jest.fn(),
+    }
+    commentsService = {
+      getCommentsByPostId: jest.fn(),
+    }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PostsResolver,
         { provide: PostsService, useValue: service },
+        { provide: PostLikesService, useValue: postLikesService },
+        { provide: CommentsService, useValue: commentsService },
         { provide: getRepositoryToken(Post), useValue: postsRepository },
       ],
     }).compile()
@@ -41,7 +60,7 @@ describe('PostsResolver', () => {
 
       ;(service.createPost as jest.Mock).mockResolvedValue(mockPost)
 
-      const result = await resolver.createPost(input)
+      const result = await resolver.createPost(input, mockUser)
       expect(result).toEqual(mockPost)
     })
   })
@@ -92,6 +111,54 @@ describe('PostsResolver', () => {
       const result = await resolver.deletePost('1')
       expect(result).toEqual({ success: true, message: 'Post deleted' })
       expect(service.deletePost).toHaveBeenCalledWith('1')
+    })
+  })
+
+  describe('@ResolveField', () => {
+    describe('likesCount', () => {
+      it('should call call service and return resonse', () => {
+        ;(postLikesService.getLikesCountByPostId as jest.Mock).mockReturnValue(
+          2,
+        )
+
+        const result = resolver.likesCount({ id: '1' } as Post)
+
+        expect(result).toEqual(2)
+      })
+    })
+
+    describe('likedByMe', () => {
+      it('should return false if user is not provided', () => {
+        const result = resolver.likedByMe({ id: '1' } as Post, null)
+
+        expect(result).toEqual(false)
+      })
+
+      it('should call call service and return resonse', () => {
+        ;(postLikesService.isPostLikedByUser as jest.Mock).mockReturnValue(true)
+
+        const result = resolver.likedByMe(
+          { id: '1' } as Post,
+          { id: '1' } as User,
+        )
+
+        expect(result).toEqual(true)
+      })
+    })
+
+    describe('comments', () => {
+      it('should call commentsService', () => {
+        const commentArray = [{ id: '1' }, { id: '2' }]
+
+        ;(commentsService.getCommentsByPostId as jest.Mock).mockReturnValue(
+          commentArray,
+        )
+
+        const result = resolver.comments({ id: '3' } as Post)
+
+        expect(commentsService.getCommentsByPostId).toHaveBeenCalled()
+        expect(result).toEqual(commentArray)
+      })
     })
   })
 })

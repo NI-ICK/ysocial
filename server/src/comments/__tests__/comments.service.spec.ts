@@ -3,20 +3,19 @@ import { CommentsService } from '../comments.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Comment } from '../comments.entity'
 import { Repository } from 'typeorm'
-import { UsersService } from 'src/users/users.service'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
-import { PostsService } from 'src/posts/posts.service'
+import { User } from 'src/users/user.entity'
+import { Post } from 'src/posts/post.entity'
 
 describe('CommentsService', () => {
   let service: CommentsService
-  let usersService: Partial<UsersService>
-  let postsService: Partial<PostsService>
   let commentsRepository: Partial<Repository<Comment>>
+  let postsRepository: Partial<Repository<Post>>
 
   const mockUser = {
     id: '1',
     username: 'test',
-  }
+  } as User
   const mockComment = {
     id: '1',
     body: 'test',
@@ -30,25 +29,22 @@ describe('CommentsService', () => {
   }
 
   beforeEach(async () => {
-    usersService = {
-      getUserBy: jest.fn(),
-    }
-    postsService = {
-      getPostById: jest.fn(),
-    }
     commentsRepository = {
       findOne: jest.fn(),
+      find: jest.fn(),
       create: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
+    }
+    postsRepository = {
+      findOne: jest.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         CommentsService,
         { provide: getRepositoryToken(Comment), useValue: commentsRepository },
-        { provide: UsersService, useValue: usersService },
-        { provide: PostsService, useValue: postsService },
+        { provide: getRepositoryToken(Post), useValue: postsRepository },
       ],
     }).compile()
 
@@ -62,11 +58,13 @@ describe('CommentsService', () => {
   describe('createComment', () => {
     it('should throw BadRequestException if body is null', async () => {
       await expect(
-        service.createComment({
-          body: '',
-          userId: '1',
-          postId: '2',
-        }),
+        service.createComment(
+          {
+            body: '',
+            postId: '2',
+          },
+          mockUser,
+        ),
       ).rejects.toThrow(BadRequestException)
     })
 
@@ -74,49 +72,42 @@ describe('CommentsService', () => {
       ;(commentsRepository.findOne as jest.Mock).mockResolvedValue(null)
 
       await expect(
-        service.createComment({
-          body: 'test',
-          userId: '1',
-          postId: '2',
-          parentId: '3',
-        }),
-      ).rejects.toThrow(NotFoundException)
-    })
-
-    it('should throw NotFoundException if user is null', async () => {
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue(null)
-
-      await expect(
-        service.createComment({
-          body: 'test',
-          userId: '1',
-          postId: '2',
-        }),
+        service.createComment(
+          {
+            body: 'test',
+            postId: '2',
+            parentId: '3',
+          },
+          mockUser,
+        ),
       ).rejects.toThrow(NotFoundException)
     })
 
     it('should throw NotFoundException if post is null', async () => {
-      ;(postsService.getPostById as jest.Mock).mockResolvedValue(null)
+      ;(postsRepository.findOne as jest.Mock).mockResolvedValue(null)
 
       await expect(
-        service.createComment({
-          body: 'test',
-          userId: '1',
-          postId: '2',
-        }),
+        service.createComment(
+          {
+            body: 'test',
+            postId: '2',
+          },
+          mockUser,
+        ),
       ).rejects.toThrow(NotFoundException)
     })
 
     it('should create and return comment without parent', async () => {
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue(mockUser)
-      ;(postsService.getPostById as jest.Mock).mockResolvedValue(postMock)
+      ;(postsRepository.findOne as jest.Mock).mockResolvedValue(postMock)
       ;(commentsRepository.create as jest.Mock).mockResolvedValue(mockComment)
 
-      const result = await service.createComment({
-        body: 'test',
-        userId: '1',
-        postId: '2',
-      })
+      const result = await service.createComment(
+        {
+          body: 'test',
+          postId: '2',
+        },
+        mockUser,
+      )
 
       expect(commentsRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -129,20 +120,21 @@ describe('CommentsService', () => {
     })
 
     it('should create and return comment with parent', async () => {
-      ;(usersService.getUserBy as jest.Mock).mockResolvedValue(mockUser)
-      ;(postsService.getPostById as jest.Mock).mockResolvedValue(postMock)
+      ;(postsRepository.findOne as jest.Mock).mockResolvedValue(postMock)
       ;(commentsRepository.findOne as jest.Mock).mockResolvedValue(parentMock)
       ;(commentsRepository.create as jest.Mock).mockResolvedValue({
         ...mockComment,
         parent: parentMock,
       })
 
-      const result = await service.createComment({
-        body: 'test',
-        userId: '1',
-        postId: '2',
-        parentId: '3',
-      })
+      const result = await service.createComment(
+        {
+          body: 'test',
+          postId: '2',
+          parentId: '3',
+        },
+        mockUser,
+      )
 
       expect(commentsRepository.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -189,6 +181,19 @@ describe('CommentsService', () => {
       await service.deleteComment('1')
 
       expect(commentsRepository.delete).toHaveBeenCalled()
+    })
+  })
+
+  describe('getCommentsByPostId', () => {
+    it('shoulds return comments', async () => {
+      ;(commentsRepository.find as jest.Mock).mockResolvedValue([mockComment])
+
+      const result = await service.getCommentsByPostId('1')
+
+      expect(commentsRepository.find).toHaveBeenCalledWith({
+        where: { post: { id: '1' } },
+      })
+      expect(result).toEqual([mockComment])
     })
   })
 })

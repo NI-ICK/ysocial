@@ -10,11 +10,17 @@ import { Parent, ResolveField } from '@nestjs/graphql'
 import { User } from 'src/users/user.entity'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
+import { PostLikesService } from 'src/post-likes/post-likes.service'
+import { CommentsService } from 'src/comments/comments.service'
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard'
 
 @Resolver(() => Post)
 export class PostsResolver {
   constructor(
     private postsService: PostsService,
+    private commentsService: CommentsService,
+    private postLikesService: PostLikesService,
     @InjectRepository(Post) private postsRepository: Repository<Post>,
   ) {}
 
@@ -27,12 +33,32 @@ export class PostsResolver {
       .loadOne()
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Mutation((_return) => Post)
-  async createPost(@Args('createPostData') data: CreatePostInput) {
-    return await this.postsService.createPost(data)
+  @ResolveField(() => [Comment])
+  comments(@Parent() post: Post) {
+    return this.commentsService.getCommentsByPostId(post.id)
   }
 
+  @ResolveField(() => Number)
+  likesCount(@Parent() post: Post) {
+    return this.postLikesService.getLikesCountByPostId(post.id)
+  }
+
+  @ResolveField(() => Boolean)
+  likedByMe(@Parent() post: Post, @CurrentUser() user?: User | null) {
+    if (!user) return false
+    return this.postLikesService.isPostLikedByUser(post.id, user.id)
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Mutation((_return) => Post)
+  async createPost(
+    @Args('createPostData') data: CreatePostInput,
+    @CurrentUser() user: User,
+  ) {
+    return await this.postsService.createPost(data, user)
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
   @Query((_return) => Post)
   getPostById(@Args('id') id: string) {
     return this.postsService.getPostById(id)

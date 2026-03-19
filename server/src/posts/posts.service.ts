@@ -9,19 +9,18 @@ import { Repository } from 'typeorm'
 import { CreatePostInput } from './dtos/create-post.input'
 import { randomUUID } from 'crypto'
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service'
-import { UsersService } from 'src/users/users.service'
 import { EditPostInput } from './dtos/edit-post.input'
+import { User } from 'src/users/user.entity'
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post) private postsRepository: Repository<Post>,
-    private usersService: UsersService,
     private cloudinaryService: CloudinaryService,
   ) {}
 
-  async createPost(data: CreatePostInput) {
-    const { body, image, userId } = data
+  async createPost(data: CreatePostInput, user: User) {
+    const { body, image } = data
 
     if (!body?.trim() && !(await image)) {
       throw new BadRequestException('Post must have a body or an image')
@@ -38,9 +37,6 @@ export class PostsService {
       imageUrl = upload.secure_url as string
       imageId = upload.public_id as string
     }
-
-    const user = await this.usersService.getUserBy({ id: userId })
-    if (!user) throw new NotFoundException('User not found')
 
     const newPost = this.postsRepository.create({
       id: randomUUID(),
