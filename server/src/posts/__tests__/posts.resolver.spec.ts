@@ -34,6 +34,7 @@ describe('PostsResolver', () => {
     }
     commentsService = {
       getCommentsByPostId: jest.fn(),
+      getCommentsCountByPostId: jest.fn(),
     }
 
     const module: TestingModule = await Test.createTestingModule({
@@ -158,6 +159,21 @@ describe('PostsResolver', () => {
 
         expect(commentsService.getCommentsByPostId).toHaveBeenCalled()
         expect(result).toEqual(commentArray)
+      })
+    })
+
+    describe('commentsCount', () => {
+      it('should return comments count', async () => {
+        ;(
+          commentsService.getCommentsCountByPostId as jest.Mock
+        ).mockResolvedValue(2)
+
+        const result = await resolver.commentsCount({
+          id: '1',
+          body: 'test',
+        } as Post)
+
+        expect(result).toEqual(2)
       })
     })
   })

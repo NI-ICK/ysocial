@@ -35,6 +35,7 @@ describe('CommentsService', () => {
       create: jest.fn(),
       save: jest.fn(),
       delete: jest.fn(),
+      count: jest.fn(),
     }
     postsRepository = {
       findOne: jest.fn(),
@@ -194,6 +195,45 @@ describe('CommentsService', () => {
         where: { post: { id: '1' } },
       })
       expect(result).toEqual([mockComment])
+    })
+  })
+
+  describe('getCommentsCountByPostId', () => {
+    it('should return comments count', async () => {
+      ;(commentsRepository.count as jest.Mock).mockResolvedValue(2)
+
+      const result = await service.getCommentsCountByPostId('1')
+
+      expect(commentsRepository.count).toHaveBeenCalledWith({
+        where: { post: { id: '1' } },
+      })
+      expect(result).toEqual(2)
+    })
+  })
+
+  describe('getRepliesByParentId', () => {
+    it('shoulds return replies', async () => {
+      ;(commentsRepository.find as jest.Mock).mockResolvedValue([mockComment])
+
+      const result = await service.getRepliesByParentId('1')
+
+      expect(commentsRepository.find).toHaveBeenCalledWith({
+        where: { parent: { id: '1' } },
+      })
+      expect(result).toEqual([mockComment])
+    })
+  })
+
+  describe('getRepliesCountByParentId', () => {
+    it('should return replies count', async () => {
+      ;(commentsRepository.count as jest.Mock).mockResolvedValue(2)
+
+      const result = await service.getRepliesCountByParentId('1')
+
+      expect(commentsRepository.count).toHaveBeenCalledWith({
+        where: { parent: { id: '1' } },
+      })
+      expect(result).toEqual(2)
     })
   })
 })

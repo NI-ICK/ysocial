@@ -1,4 +1,11 @@
-import { Args, Mutation, Parent, ResolveField, Resolver } from '@nestjs/graphql'
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql'
 import { CreateCommentInput } from './dtos/create-comment.input'
 import { CommentsService } from './comments.service'
 import { UseGuards } from '@nestjs/common'
@@ -11,7 +18,7 @@ import { User } from 'src/users/user.entity'
 import { Post } from 'src/posts/post.entity'
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
 import { CommentLikesService } from 'src/comment-likes/comment-likes.service'
-
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard'
 @Resolver(() => Comment)
 export class CommentsResolver {
   constructor(
@@ -67,6 +74,11 @@ export class CommentsResolver {
     return this.commentLikesService.isCommentLikedByUser(comment.id, user.id)
   }
 
+  @ResolveField(() => Number)
+  repliesCount(@Parent() comment: Comment) {
+    return this.commentsService.getRepliesCountByParentId(comment.id)
+  }
+
   @UseGuards(JwtAuthGuard)
   @Mutation((_returns) => Comment)
   async createComment(
@@ -81,5 +93,11 @@ export class CommentsResolver {
   async deleteComment(@Args('id') id: string) {
     await this.commentsService.deleteComment(id)
     return { success: true }
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Query(() => [Comment])
+  async getRepliesByParentId(@Args('id') id: string) {
+    return await this.commentsService.getRepliesByParentId(id)
   }
 }

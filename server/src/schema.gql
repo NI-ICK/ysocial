@@ -28,6 +28,7 @@ type Post {
   likes: [PostLike!]
   likesCount: Float!
   likedByMe: Boolean!
+  commentsCount: Float!
 }
 
 """
@@ -47,6 +48,7 @@ type Comment {
   likes: [CommentLike!]!
   likesCount: Float!
   likedByMe: Boolean!
+  repliesCount: Float!
 }
 
 type User {
@@ -101,6 +103,7 @@ type Query {
   getAllUsers: [User!]!
   getPostById(id: String!): Post!
   getAllPosts: [Post!]!
+  getRepliesByParentId(id: String!): [Comment!]!
 }
 
 type Mutation {

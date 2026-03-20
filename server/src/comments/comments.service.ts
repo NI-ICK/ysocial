@@ -66,10 +66,26 @@ export class CommentsService {
   }
 
   async getCommentsByPostId(postId: string) {
-    const comments = await this.commentsRepository.find({
+    return await this.commentsRepository.find({
       where: { post: { id: postId } },
     })
+  }
 
-    return comments
+  async getCommentsCountByPostId(postId: string) {
+    return await this.commentsRepository.count({
+      where: { post: { id: postId } },
+    })
+  }
+
+  async getRepliesByParentId(parentId: string) {
+    return await this.commentsRepository.find({
+      where: { parent: { id: parentId } },
+    })
+  }
+
+  async getRepliesCountByParentId(parentId: string) {
+    return await this.commentsRepository.count({
+      where: { parent: { id: parentId } },
+    })
   }
 }

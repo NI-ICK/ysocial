@@ -49,6 +49,11 @@ export class PostsResolver {
     return this.postLikesService.isPostLikedByUser(post.id, user.id)
   }
 
+  @ResolveField(() => Number)
+  commentsCount(@Parent() post: Post) {
+    return this.commentsService.getCommentsCountByPostId(post.id)
+  }
+
   @UseGuards(JwtAuthGuard)
   @Mutation((_return) => Post)
   async createPost(
