@@ -69,6 +69,7 @@ export class PostsResolver {
     return this.postsService.getPostById(id)
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Query((_return) => [Post])
   getAllPosts() {
     return this.postsService.getAllPosts()
