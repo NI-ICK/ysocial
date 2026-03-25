@@ -5,6 +5,9 @@ export interface Post {
   imagePublicId: string | null
   createdAt: string
   updatedAt: string
+  likesCount: number
+  likedByMe: boolean
+  commentsCount: number
   user: {
     id: string
     username: string

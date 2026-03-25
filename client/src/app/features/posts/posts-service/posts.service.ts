@@ -5,6 +5,7 @@ import {
   EDIT_POST,
   GET_ALL_POSTS,
   GET_POST_BY_ID,
+  TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
 import { Post } from '../../../utils/post.interface'
 import { Apollo } from 'apollo-angular'
@@ -32,6 +33,12 @@ interface EditPostResponse {
   editPost: Post
 }
 
+interface TogglePostLikeResponse {
+  togglePostLike: {
+    addLike: boolean
+  }
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -51,10 +58,10 @@ export class PostsService {
     })
   }
 
-  createPost(userId: string, body: string | null, file: File | null) {
+  createPost(body: string | null, file: File | null) {
     return this.apollo.mutate<CreatePostResponse>({
       mutation: CREATE_POST,
-      variables: { userId, body, image: file },
+      variables: { body, image: file },
     })
   }
 
@@ -69,6 +76,13 @@ export class PostsService {
     return this.apollo.mutate<EditPostResponse>({
       mutation: EDIT_POST,
       variables: { id, body },
+    })
+  }
+
+  togglePostLike(postId: string) {
+    return this.apollo.mutate<TogglePostLikeResponse>({
+      mutation: TOGGLE_POST_LIKE,
+      variables: { postId },
     })
   }
 }

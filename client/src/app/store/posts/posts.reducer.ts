@@ -63,5 +63,35 @@ export const postsReducer = createReducer(
   ),
   on(PostsActions.editPostFailure, (state, { id, prevBody }) =>
     updatePost(id, { body: prevBody }, state)
-  )
+  ),
+  on(PostsActions.togglePostLike, (state, { postId }) => {
+    const post = state.entities[postId]
+
+    if (!post) return state
+
+    const likedByMe = !post.likedByMe
+
+    const updatedState = postsAdapter.updateOne(
+      {
+        id: postId,
+        changes: {
+          likedByMe,
+          likesCount: likedByMe
+            ? post.likesCount + 1
+            : Math.max(0, post.likesCount - 1),
+        },
+      },
+      state
+    )
+
+    return {
+      ...updatedState,
+      likingPost: { ...updatedState.likingPost, [postId]: true },
+    }
+  }),
+  on(PostsActions.togglePostLikeSuccess, (state, { postId }) => {
+    const { [postId]: _, ...rest } = state.likingPost
+
+    return { ...state, likingPost: rest }
+  })
 )

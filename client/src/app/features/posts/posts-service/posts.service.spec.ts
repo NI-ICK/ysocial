@@ -11,7 +11,9 @@ import {
   EDIT_POST,
   GET_ALL_POSTS,
   GET_POST_BY_ID,
+  TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
+import { togglePostLike } from '../../../store/posts/posts.actions'
 
 describe('PostsServiceService', () => {
   let service: PostsService
@@ -34,12 +36,11 @@ describe('PostsServiceService', () => {
   })
 
   describe('getAllPosts', () => {
-    it('should return array of posts', () => {
-      service
-        .getAllPosts()
-        .subscribe((result) =>
-          expect(result.data?.getAllPosts).toEqual([postMock])
-        )
+    it('should return array of posts', (done) => {
+      service.getAllPosts().subscribe((result) => {
+        expect(result.data?.getAllPosts).toEqual([postMock])
+        done()
+      })
 
       const op = apolloController.expectOne(GET_ALL_POSTS)
       op.flush({ data: { getAllPosts: [postMock] } })
@@ -48,15 +49,15 @@ describe('PostsServiceService', () => {
   })
 
   describe('createPost', () => {
-    it('should return created post with correct variables', () => {
-      service.createPost('1', 'test', null).subscribe((result) => {
+    it('should return created post with correct variables', (done) => {
+      service.createPost('test', null).subscribe((result) => {
         expect(result.data?.createPost).toEqual(postMock)
+        done()
       })
 
       const op = apolloController.expectOne(CREATE_POST)
 
       expect(op.operation.variables).toEqual({
-        userId: '1',
         body: 'test',
         image: null,
       })
@@ -67,9 +68,10 @@ describe('PostsServiceService', () => {
   })
 
   describe('getPostById', () => {
-    it('should return post with correct variables', () => {
+    it('should return post with correct variables', (done) => {
       service.getPostById('1').subscribe((result) => {
         expect(result.data?.getPostById).toEqual(postMock)
+        done()
       })
 
       const op = apolloController.expectOne(GET_POST_BY_ID)
@@ -84,11 +86,12 @@ describe('PostsServiceService', () => {
   })
 
   describe('deletePost', () => {
-    it('should return message with correct variables', () => {
+    it('should return message with correct variables', (done) => {
       const deleteMock = { success: true, message: 'Test' }
 
       service.deletePost('1').subscribe((result) => {
         expect(result.data?.deletePost).toEqual(deleteMock)
+        done()
       })
 
       const op = apolloController.expectOne(DELETE_POST)
@@ -103,9 +106,10 @@ describe('PostsServiceService', () => {
   })
 
   describe('editPost', () => {
-    it('should return edited post', () => {
+    it('should return edited post', (done) => {
       service.editPost('1', 'test').subscribe((result) => {
         expect(result.data?.editPost).toEqual(postMock)
+        done()
       })
 
       const op = apolloController.expectOne(EDIT_POST)
@@ -116,6 +120,24 @@ describe('PostsServiceService', () => {
       })
 
       op.flush({ data: { editPost: postMock } })
+      apolloController.verify()
+    })
+  })
+
+  describe('togglePostLike', () => {
+    it('should return response', (done) => {
+      service.togglePostLike('1').subscribe((result) => {
+        expect(result.data?.togglePostLike.addLike).toEqual(true)
+        done()
+      })
+
+      const op = apolloController.expectOne(TOGGLE_POST_LIKE)
+
+      expect(op.operation.variables).toEqual({
+        postId: '1',
+      })
+
+      op.flush({ data: { togglePostLike: { addLike: true } } })
       apolloController.verify()
     })
   })

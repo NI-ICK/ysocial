@@ -27,3 +27,11 @@ export const selectCurrentPost = createSelector(
 
 export const selectPostById = (id: string) =>
   createSelector(selectEntities, (entities) => entities[id])
+
+export const selectIsLiking = createSelector(
+  selectPostsState,
+  (state) => state.likingPost
+)
+
+export const selectIsLikingPost = (id: string) =>
+  createSelector(selectIsLiking, (liking) => liking[id])

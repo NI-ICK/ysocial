@@ -35,6 +35,7 @@ describe('Posts Effects', () => {
       getPostById: jest.fn(),
       deletePost: jest.fn(),
       editPost: jest.fn(),
+      togglePostLike: jest.fn(),
     }
 
     TestBed.configureTestingModule({
@@ -344,6 +345,38 @@ describe('Posts Effects', () => {
           )
           done()
         })
+      })
+    })
+  })
+
+  describe('togglePostLike', () => {
+    it('should dispatch togglePostLikeSuccess when postsService.togglePostLike succeeds', (done) => {
+      ;(postsService.togglePostLike as jest.Mock).mockReturnValue(
+        of({ data: { togglePostLike: { addLike: true } } })
+      )
+
+      actions$ = of(PostsActions.togglePostLike({ postId: '1' }))
+
+      effects.togglePostLike$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.togglePostLikeSuccess({ postId: '1' })
+        )
+        done()
+      })
+    })
+
+    it('should dispatch togglePostLikeFailure when postsService.togglePostLike fails', (done) => {
+      ;(postsService.togglePostLike as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(PostsActions.togglePostLike({ postId: '1' }))
+
+      effects.togglePostLike$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.togglePostLikeFailure({ error: 'test error' })
+        )
+        done()
       })
     })
   })

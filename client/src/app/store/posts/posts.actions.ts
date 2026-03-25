@@ -73,3 +73,17 @@ export const editPostFailure = createAction(
   '[Posts] Edit Post Failure',
   props<{ error: string; prevBody: string | null; id: string }>()
 )
+
+// ----- Toggle Post Like -----
+export const togglePostLike = createAction(
+  '[Posts] Toggle Post Like',
+  props<{ postId: string }>()
+)
+export const togglePostLikeSuccess = createAction(
+  '[Posts] Toggle Post Like Success',
+  props<{ postId: string }>()
+)
+export const togglePostLikeFailure = createAction(
+  '[Posts] Toggle Post Like Failure',
+  props<{ error: string }>()
+)

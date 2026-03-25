@@ -12,6 +12,8 @@ describe('Posts Reducer', () => {
     id: '3',
     body: 'test',
     image: null,
+    likedByMe: false,
+    likesCount: 0,
   } as Post
   const tmpPost = {
     id: 'tmp-5',
@@ -197,6 +199,35 @@ describe('Posts Reducer', () => {
       )
 
       expect(state).toEqual(expectedState)
+    })
+  })
+
+  describe('togglePostLike', () => {
+    it('should update likedByMe and likesCount fields and likingPost on togglePostLike', () => {
+      const stateWithPost = postsAdapter.addOne(mockPost, initialState)
+
+      const state = postsReducer(
+        stateWithPost,
+        PostsActions.togglePostLike({ postId: '3' })
+      )
+
+      const expectedState = postsAdapter.updateOne(
+        { id: '3', changes: { likedByMe: true, likesCount: 1 } },
+        stateWithPost
+      )
+
+      expect(state).toEqual({ ...expectedState, likingPost: { '3': true } })
+    })
+
+    it('should remove likingPost on togglePostLikeSuccess', () => {
+      const initial = { ...initialState, likingPost: { '1': true, '2': true } }
+
+      const state = postsReducer(
+        initial,
+        PostsActions.togglePostLikeSuccess({ postId: '1' })
+      )
+
+      expect(state.likingPost).toEqual({ '2': true })
     })
   })
 })

@@ -74,12 +74,15 @@ export class PostsEffects {
               },
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
+              likesCount: 0,
+              likedByMe: false,
+              commentsCount: 0,
             }
 
             return concat(
               of(PostsActions.createPostSuccess({ post: optimisticPost })),
 
-              this.postsService.createPost(user.id, body, file).pipe(
+              this.postsService.createPost(body, file).pipe(
                 map((result) => {
                   const realPost = result.data?.createPost
                   if (!realPost) throw new Error('Post creation failed')
@@ -196,5 +199,19 @@ export class PostsEffects {
         tap(() => this.popupService.showPopup('Failed to Edit Post'))
       ),
     { dispatch: false }
+  )
+
+  togglePostLike$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(PostsActions.togglePostLike),
+      switchMap(({ postId }) =>
+        this.postsService.togglePostLike(postId).pipe(
+          map(() => PostsActions.togglePostLikeSuccess({ postId })),
+          catchError((err) =>
+            of(PostsActions.togglePostLikeFailure({ error: err.message }))
+          )
+        )
+      )
+    )
   )
 }

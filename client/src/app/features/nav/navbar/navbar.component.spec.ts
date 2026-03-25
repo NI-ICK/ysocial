@@ -13,9 +13,7 @@ import {
 import { User } from '../../../utils/user.interface'
 
 @Component({ selector: 'modal-wrapper' })
-class ModalWrapperComponentMock {
-  @Input() backgroundVisible?: boolean
-}
+class ModalWrapperComponentMock {}
 
 @Component({ selector: 'login-form' })
 class LoginFormComponentMock {}

@@ -1,15 +1,15 @@
 import { gql } from 'apollo-angular'
 
 export const CREATE_POST = gql`
-  mutation createPost($body: String, $image: Upload, $userId: String!) {
-    createPost(
-      createPostData: { body: $body, image: $image, userId: $userId }
-    ) {
+  mutation createPost($body: String, $image: Upload) {
+    createPost(createPostData: { body: $body, image: $image }) {
       id
       body
       image
       createdAt
       updatedAt
+      likesCount
+      likedByMe
       user {
         id
         username
@@ -27,6 +27,9 @@ export const GET_ALL_POSTS = gql`
       image
       createdAt
       updatedAt
+      likesCount
+      likedByMe
+      commentsCount
       user {
         id
         username
@@ -44,10 +47,22 @@ export const GET_POST_BY_ID = gql`
       image
       createdAt
       updatedAt
+      likesCount
+      likedByMe
       user {
         id
         username
         imagePath
+      }
+      comments {
+        id
+        body
+        repliesCount
+        user {
+          id
+          username
+          imagePath
+        }
       }
     }
   }
@@ -70,11 +85,21 @@ export const EDIT_POST = gql`
       image
       createdAt
       updatedAt
+      likesCount
+      likedByMe
       user {
         id
         username
         imagePath
       }
+    }
+  }
+`
+
+export const TOGGLE_POST_LIKE = gql`
+  mutation togglePostLike($postId: String!) {
+    togglePostLike(postId: $postId) {
+      addLike
     }
   }
 `

@@ -26,6 +26,7 @@ export class CreatePostFormComponent implements OnInit {
   fb = new FormBuilder()
   imageIconHovered = false
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>
+  @ViewChild('textarea') textareaRef!: ElementRef<HTMLTextAreaElement>
   selectedFile: File | null = null
   imagePreview = ''
 
@@ -33,25 +34,23 @@ export class CreatePostFormComponent implements OnInit {
     body: [''],
   })
 
-  @ViewChild('textarea')
-  set textarea(el: ElementRef<HTMLTextAreaElement> | undefined) {
-    if (!el) return
-
-    const textarea = el.nativeElement
-
-    const resize = () => {
-      textarea.style.height = 'auto'
-      textarea.style.height = textarea.scrollHeight + 'px'
-    }
-
-    resize()
-    textarea.addEventListener('input', resize)
-  }
-
   constructor(private store: Store) {}
 
   ngOnInit() {
     this.currentUser$ = this.store.select(selectCurrentUser)
+
+    this.createPostForm.get('body')?.valueChanges.subscribe(() => {
+      this.resizeTextarea()
+    })
+  }
+
+  resizeTextarea() {
+    const textarea = this.textareaRef.nativeElement
+
+    if (!textarea) return
+
+    textarea.style.height = 'auto'
+    textarea.style.height = textarea.scrollHeight + 'px'
   }
 
   handleChooseFile() {

@@ -13,6 +13,7 @@ describe('Posts Selectors', () => {
     currentPostId: '1',
     postsLoading: false,
     error: null,
+    likingPost: { '1': true },
   }
   const appState = { posts: mockState }
 
@@ -55,5 +56,17 @@ describe('Posts Selectors', () => {
     const result = PostsSelectors.selectPostById('1')(appState)
 
     expect(result).toEqual(mockPosts[0])
+  })
+
+  it('should select likingPost', () => {
+    const result = PostsSelectors.selectIsLiking(appState)
+
+    expect(result).toEqual({ '1': true })
+  })
+
+  it('should select likingPost for a specific post', () => {
+    const result = PostsSelectors.selectIsLikingPost('1')(appState)
+
+    expect(result).toEqual(true)
   })
 })
