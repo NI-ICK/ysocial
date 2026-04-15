@@ -6,7 +6,7 @@ import {
 import { CreateCommentInput } from './dtos/create-comment.input'
 import { Comment } from './comments.entity'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { IsNull, Repository } from 'typeorm'
 import { randomUUID } from 'crypto'
 import { User } from 'src/users/user.entity'
 import { Post } from 'src/posts/post.entity'
@@ -68,18 +68,20 @@ export class CommentsService {
   async getCommentsByPostId(postId: string) {
     return await this.commentsRepository.find({
       where: { post: { id: postId } },
+      order: { createdAt: 'DESC' },
     })
   }
 
   async getCommentsCountByPostId(postId: string) {
     return await this.commentsRepository.count({
-      where: { post: { id: postId } },
+      where: { post: { id: postId }, parent: IsNull() },
     })
   }
 
   async getRepliesByParentId(parentId: string) {
     return await this.commentsRepository.find({
       where: { parent: { id: parentId } },
+      order: { createdAt: 'DESC' },
     })
   }
 

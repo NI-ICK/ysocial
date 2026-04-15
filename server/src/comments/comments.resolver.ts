@@ -97,6 +97,12 @@ export class CommentsResolver {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Query(() => [Comment])
+  async getCommentsByPostId(@Args('id') id: string) {
+    return await this.commentsService.getCommentsByPostId(id)
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Query(() => [Comment])
   async getRepliesByParentId(@Args('id') id: string) {
     return await this.commentsService.getRepliesByParentId(id)
   }

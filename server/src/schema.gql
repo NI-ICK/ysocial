@@ -103,6 +103,7 @@ type Query {
   getAllUsers: [User!]!
   getPostById(id: String!): Post!
   getAllPosts: [Post!]!
+  getCommentsByPostId(id: String!): [Comment!]!
   getRepliesByParentId(id: String!): [Comment!]!
 }
 

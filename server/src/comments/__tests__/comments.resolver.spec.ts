@@ -30,6 +30,7 @@ describe('CommentsResolver', () => {
       deleteComment: jest.fn(),
       getRepliesByParentId: jest.fn(),
       getRepliesCountByParentId: jest.fn(),
+      getCommentsByPostId: jest.fn(),
     }
     commentLikesService = {
       getLikesCountByCommentId: jest.fn(),
@@ -86,6 +87,20 @@ describe('CommentsResolver', () => {
 
       expect(commentsService.getRepliesByParentId).toHaveBeenCalled()
       expect(result).toEqual(mockReplies)
+    })
+  })
+
+  describe('getCommentsByPostId', () => {
+    it('should return comments', async () => {
+      const mockComments = [{ id: '1' }, { id: '2' }]
+      ;(commentsService.getCommentsByPostId as jest.Mock).mockResolvedValue(
+        mockComments,
+      )
+
+      const result = await resolver.getCommentsByPostId('5')
+
+      expect(commentsService.getCommentsByPostId).toHaveBeenCalled()
+      expect(result).toEqual(mockComments)
     })
   })
 

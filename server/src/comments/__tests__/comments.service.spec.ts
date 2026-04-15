@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { CommentsService } from '../comments.service'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Comment } from '../comments.entity'
-import { Repository } from 'typeorm'
+import { IsNull, Repository } from 'typeorm'
 import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { User } from 'src/users/user.entity'
 import { Post } from 'src/posts/post.entity'
@@ -193,6 +193,7 @@ describe('CommentsService', () => {
 
       expect(commentsRepository.find).toHaveBeenCalledWith({
         where: { post: { id: '1' } },
+        order: { createdAt: 'DESC' },
       })
       expect(result).toEqual([mockComment])
     })
@@ -205,7 +206,7 @@ describe('CommentsService', () => {
       const result = await service.getCommentsCountByPostId('1')
 
       expect(commentsRepository.count).toHaveBeenCalledWith({
-        where: { post: { id: '1' } },
+        where: { post: { id: '1' }, parent: IsNull() },
       })
       expect(result).toEqual(2)
     })
@@ -219,6 +220,7 @@ describe('CommentsService', () => {
 
       expect(commentsRepository.find).toHaveBeenCalledWith({
         where: { parent: { id: '1' } },
+        order: { createdAt: 'DESC' },
       })
       expect(result).toEqual([mockComment])
     })
