@@ -7,7 +7,7 @@ import {
   GET_POST_BY_ID,
   TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import { Apollo } from 'apollo-angular'
 
 interface GetAllPostsResponse {

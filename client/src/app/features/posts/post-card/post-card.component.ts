@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import { RouterLink } from '@angular/router'
 import { CommonModule } from '@angular/common'
 import { ImagePreloadDirective } from '../../../shared/directives/image-preload/image-preload.directive'
@@ -8,9 +8,11 @@ import { CommentIconComponent } from '../../../shared/icons/comment-icon/comment
 import { Store } from '@ngrx/store'
 import { togglePostLike } from '../../../store/posts/posts.actions'
 import { selectIsLikingPost } from '../../../store/posts/posts.selectors'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import { selectCurrentUser } from '../../../store/auth/auth.selectors'
 import { UiStateService } from '../../../shared/services/ui-state-service/ui-state.service'
+import { combineLatest, Observable, of, take } from 'rxjs'
+import { timeAgo } from '../../../utils/time-ago'
 
 @Component({
   selector: 'post-card',
@@ -26,32 +28,32 @@ import { UiStateService } from '../../../shared/services/ui-state-service/ui-sta
 })
 export class PostCardComponent implements OnInit {
   @Input() post!: Post
-  currentUser: User | null = null
-  isLiking = false
+  currentUser$: Observable<User | null> = new Observable()
+  isLiking$: Observable<boolean> = of(false)
+  timeAgo = timeAgo
 
   constructor(private store: Store, private uiStateService: UiStateService) {}
 
   ngOnInit() {
-    this.store
-      .select(selectIsLikingPost(this.post.id))
-      .subscribe((liking) => (this.isLiking = liking))
-
-    this.store
-      .select(selectCurrentUser)
-      .subscribe((user) => (this.currentUser = user))
+    this.isLiking$ = this.store.select(selectIsLikingPost(this.post.id))
+    this.currentUser$ = this.store.select(selectCurrentUser)
   }
 
   handleExpand() {
-    this.uiStateService.setExpanded(this.post.id)
+    this.uiStateService.setExpandedPost(this.post.id)
   }
 
   isExpanded() {
-    return this.uiStateService.isExpanded(this.post.id)
+    return this.uiStateService.isPostExpanded(this.post.id)
   }
 
   toggleLike() {
-    if (this.isLiking || !this.currentUser) return
+    combineLatest([this.isLiking$, this.currentUser$])
+      .pipe(take(1))
+      .subscribe(([isLiking, currentUser]) => {
+        if (isLiking || !currentUser) return
 
-    this.store.dispatch(togglePostLike({ postId: this.post.id }))
+        this.store.dispatch(togglePostLike({ postId: this.post.id }))
+      })
   }
 }

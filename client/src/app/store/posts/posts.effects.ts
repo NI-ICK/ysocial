@@ -18,7 +18,7 @@ import { PostsService } from '../../features/posts/posts-service/posts.service'
 import { Store } from '@ngrx/store'
 import { selectCurrentUser } from '../auth/auth.selectors'
 import { v4 as uuid } from 'uuid'
-import { Post } from '../../utils/post.interface'
+import { Post } from '../../utils/interfaces/post.interface'
 
 @Injectable()
 export class PostsEffects {

@@ -7,7 +7,7 @@ import { RegisterFormComponent } from '../../../features/auth/register-form/regi
 import { UserMenuComponent } from '../../../features/nav/user-menu/user-menu.component'
 import { ModalWrapperComponent } from '../../../shared/modal-wrapper/modal-wrapper.component'
 import { AuthStatus } from '../../../utils/auth-status.enum'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import { ImagePreloadDirective } from '../../../shared/directives/image-preload/image-preload.directive'
 import { Store } from '@ngrx/store'
 import {

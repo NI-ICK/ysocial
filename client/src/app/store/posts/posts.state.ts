@@ -1,4 +1,4 @@
-import { Post } from '../../utils/post.interface'
+import { Post } from '../../utils/interfaces/post.interface'
 import { EntityState, createEntityAdapter } from '@ngrx/entity'
 
 export interface PostsState extends EntityState<Post> {

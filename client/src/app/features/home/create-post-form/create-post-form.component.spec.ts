@@ -3,7 +3,7 @@ import { CreatePostFormComponent } from './create-post-form.component'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { createPost } from '../../../store/posts/posts.actions'
 import { selectCurrentUser } from '../../../store/auth/auth.selectors'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 
 describe('CreatePostFormComponent', () => {
   let component: CreatePostFormComponent

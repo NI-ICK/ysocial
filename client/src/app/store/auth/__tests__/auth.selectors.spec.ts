@@ -1,7 +1,7 @@
 import { AuthStatus } from '../../../utils/auth-status.enum'
 import { AuthState } from '../auth.state'
 import * as AuthSelectors from '../auth.selectors'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 
 describe('Auth Selectors', () => {
   const mockUser = { id: '1', username: 'test' } as User

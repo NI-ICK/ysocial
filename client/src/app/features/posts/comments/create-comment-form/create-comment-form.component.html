@@ -1,0 +1,15 @@
+<div class="container" *ngIf="currentUser$ | async as currentUser">
+  <div class="profile">
+    <img [src]="currentUser.imagePath" default="profile" />
+  </div>
+  <form [formGroup]="createCommentForm" (ngSubmit)="handleFormSubmit()">
+    <div class="field">
+      <textarea
+        #textarea
+        formControlName="body"
+        placeholder="Post your comment"
+      ></textarea>
+      <button type="submit">Post</button>
+    </div>
+  </form>
+</div>

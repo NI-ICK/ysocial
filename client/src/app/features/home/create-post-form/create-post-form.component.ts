@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import { ImageIconComponent } from '../../../shared/icons/image-icon/image-icon.component'
 import { ImagePreloadDirective } from '../../../shared/directives/image-preload/image-preload.directive'
 import { CommonModule, NgIf } from '@angular/common'

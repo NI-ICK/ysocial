@@ -5,12 +5,25 @@ import { Injectable } from '@angular/core'
 })
 export class UiStateService {
   expandedPosts: Record<string, boolean> = {}
+  expandedReplies: Record<string, boolean> = {}
 
-  setExpanded(id: string) {
+  setExpandedPost(id: string) {
     this.expandedPosts[id] = true
   }
 
-  isExpanded(id: string) {
+  isPostExpanded(id: string) {
     return this.expandedPosts[id]
+  }
+
+  expandReplies(id: string) {
+    this.expandedReplies[id] = true
+  }
+
+  collapseReplies(id: string) {
+    this.expandedReplies[id] = false
+  }
+
+  areRepliesExpanded(id: string) {
+    return this.expandedReplies[id]
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { BehaviorSubject } from 'rxjs'
-import { Popup } from '../../utils/popup.interface'
+import { Popup } from '../../utils/interfaces/popup.interface'
 
 @Injectable({
   providedIn: 'root',

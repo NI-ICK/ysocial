@@ -1,23 +1,35 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { PostDetailsComponent } from './post-details.component'
-import { ActivatedRoute, convertToParamMap, Router } from '@angular/router'
+import {
+  ActivatedRoute,
+  convertToParamMap,
+  Router,
+  RouterModule,
+} from '@angular/router'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import {
   clearCurrentPost,
   deletePost,
   editPost,
   loadCurrentPost,
+  togglePostLike,
 } from '../../../store/posts/posts.actions'
 import { selectCurrentUser } from '../../../store/auth/auth.selectors'
 import { forkJoin, take } from 'rxjs'
-import { User } from '../../../utils/user.interface'
-import { selectCurrentPost } from '../../../store/posts/posts.selectors'
-import { Post } from '../../../utils/post.interface'
+import { User } from '../../../utils/interfaces/user.interface'
+import {
+  selectCurrentPost,
+  selectIsLiking,
+} from '../../../store/posts/posts.selectors'
+import { Post } from '../../../utils/interfaces/post.interface'
+import { CommentsState } from '../../../store/comments/comments.state'
+import { selectCommentsState } from '../../../store/comments/comments.selectors'
+import { Comment } from '../../../utils/interfaces/comment.interface'
 
 describe('PostDetailsComponent', () => {
   let component: PostDetailsComponent
   let fixture: ComponentFixture<PostDetailsComponent>
-  let routerMock: Partial<Router>
+  let router: Router
   let activatedRouteMock = {
     snapshot: {
       paramMap: convertToParamMap({ postId: '123' }),
@@ -36,11 +48,35 @@ describe('PostDetailsComponent', () => {
     id: '234',
     username: 'test',
   } as User
+  const mockComment1 = {
+    id: '1',
+    body: 'test',
+    user: {
+      username: 'test',
+    },
+  } as Comment
+  const mockComment2 = {
+    id: '2',
+    body: 'test2',
+    user: {
+      username: 'test',
+    },
+  } as Comment
+  const mockCommentsState: CommentsState = {
+    replies: {},
+    ids: ['1', '2'],
+    entities: {
+      '1': mockComment1,
+      '2': mockComment2,
+    },
+    postComments: { '123': ['1', '2'] },
+    loadingRootComments: {},
+    loadingReplies: {},
+    likingComment: {},
+    error: null,
+  }
 
   beforeEach(async () => {
-    routerMock = {
-      navigate: jest.fn(),
-    }
     activatedRouteMock = {
       snapshot: {
         paramMap: convertToParamMap({ postId: '123' }),
@@ -48,16 +84,12 @@ describe('PostDetailsComponent', () => {
     }
 
     await TestBed.configureTestingModule({
-      imports: [PostDetailsComponent],
+      imports: [PostDetailsComponent, RouterModule.forRoot([])],
       providers: [
         provideMockStore(),
         {
           provide: ActivatedRoute,
           useValue: activatedRouteMock,
-        },
-        {
-          provide: Router,
-          useValue: routerMock,
         },
       ],
     }).compileComponents()
@@ -65,10 +97,13 @@ describe('PostDetailsComponent', () => {
     fixture = TestBed.createComponent(PostDetailsComponent)
     component = fixture.componentInstance
     store = TestBed.inject(MockStore)
+    router = TestBed.inject(Router)
     fixture.detectChanges()
 
     store.overrideSelector(selectCurrentUser, userMock)
     store.overrideSelector(selectCurrentPost, postMock)
+    store.overrideSelector(selectIsLiking, { '123': false })
+    store.overrideSelector(selectCommentsState, mockCommentsState)
   })
 
   it('should create', () => {
@@ -78,13 +113,14 @@ describe('PostDetailsComponent', () => {
   describe('ngOnInit', () => {
     it('should navigate to 404 page if postId is null', () => {
       activatedRouteMock.snapshot.paramMap = convertToParamMap({ postId: null })
+      const navigateSpy = jest.spyOn(router, 'navigate')
 
       component.ngOnInit()
 
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/404'])
+      expect(navigateSpy).toHaveBeenCalledWith(['/404'])
     })
 
-    it('should assign post, currentUser, default form value and dispatch loadCurrentPost', (done) => {
+    it('should assign post, currentUser, isLiking, default form value and dispatch loadCurrentPost', (done) => {
       const dispatchSpy = jest.spyOn(store, 'dispatch')
 
       component.ngOnInit()
@@ -93,15 +129,19 @@ describe('PostDetailsComponent', () => {
       forkJoin({
         user: component.currentUser$.pipe(take(1)),
         post: component.post$.pipe(take(1)),
-      }).subscribe(({ user, post }) => {
-        if (!post || !user) return
+        comments: component.comments$.pipe(take(1)),
+        isLiking: component.isLiking$.pipe(take(1)),
+      }).subscribe(({ user, post, comments, isLiking }) => {
+        expect(user?.id).toEqual('234')
+        expect(user?.username).toEqual('test')
 
-        expect(user.id).toEqual('234')
-        expect(user.username).toEqual('test')
+        expect(post?.id).toEqual('123')
+        expect(post?.body).toEqual('test')
 
-        expect(post.id).toEqual('123')
-        expect(post.body).toEqual('test')
+        expect(comments[0].body).toEqual('test')
+        expect(comments[1].body).toEqual('test2')
 
+        expect(isLiking).toEqual(false)
         done()
       })
       expect(component.editForm.get('body')?.value).toEqual('test')
@@ -111,11 +151,12 @@ describe('PostDetailsComponent', () => {
   describe('deletePost', () => {
     it('should dispatch deletePost and navigate', () => {
       const dispatchSpy = jest.spyOn(store, 'dispatch')
+      const navigateSpy = jest.spyOn(router, 'navigate')
 
       component.deletePost()
 
       expect(dispatchSpy).toHaveBeenCalledWith(deletePost({ post: postMock }))
-      expect(routerMock.navigate).toHaveBeenCalledWith(['/'])
+      expect(navigateSpy).toHaveBeenCalledWith(['/'])
     })
   })
 
@@ -154,6 +195,45 @@ describe('PostDetailsComponent', () => {
       component.ngOnDestroy()
 
       expect(dispatchSpy).toHaveBeenCalledWith(clearCurrentPost())
+    })
+  })
+
+  describe('toggleLike', () => {
+    it('should return if post is null', () => {
+      store.overrideSelector(selectCurrentPost, null)
+      const dispatchSpy = jest.spyOn(store, 'dispatch')
+
+      component.toggleLike()
+
+      expect(dispatchSpy).not.toHaveBeenCalled()
+    })
+
+    it('should return if isLiking is true', () => {
+      store.overrideSelector(selectIsLiking, { '123': true })
+      const dispatchSpy = jest.spyOn(store, 'dispatch')
+
+      component.toggleLike()
+
+      expect(dispatchSpy).not.toHaveBeenCalled()
+    })
+
+    it('should return if currentUser is null', () => {
+      store.overrideSelector(selectCurrentUser, null)
+      const dispatchSpy = jest.spyOn(store, 'dispatch')
+
+      component.toggleLike()
+
+      expect(dispatchSpy).not.toHaveBeenCalled()
+    })
+
+    it('should dispatch togglePostLike', () => {
+      const dispatchSpy = jest.spyOn(store, 'dispatch')
+
+      component.toggleLike()
+
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        togglePostLike({ postId: '123' })
+      )
     })
   })
 })

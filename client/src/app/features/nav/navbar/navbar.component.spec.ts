@@ -3,14 +3,14 @@ import { NavbarComponent } from './navbar.component'
 import { RouterModule } from '@angular/router'
 import { AuthStatus } from '../../../utils/auth-status.enum'
 import { By } from '@angular/platform-browser'
-import { Component, Input } from '@angular/core'
+import { Component } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import {
   selectAuthStatus,
   selectCurrentUser,
 } from '../../../store/auth/auth.selectors'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 
 @Component({ selector: 'modal-wrapper' })
 class ModalWrapperComponentMock {}

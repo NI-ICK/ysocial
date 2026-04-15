@@ -1,4 +1,4 @@
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import { postsAdapter, PostsState } from '../posts.state'
 import * as PostsSelectors from '../posts.selectors'
 

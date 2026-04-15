@@ -2,7 +2,7 @@ import { authReducer } from '../auth.reducer'
 import { initialState } from '../auth.state'
 import * as AuthActions from '../auth.actions'
 import { AuthStatus } from '../../../utils/auth-status.enum'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 
 describe('Auth Reducer', () => {
   const mockUser = {

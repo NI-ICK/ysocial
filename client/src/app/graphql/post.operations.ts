@@ -49,20 +49,11 @@ export const GET_POST_BY_ID = gql`
       updatedAt
       likesCount
       likedByMe
+      commentsCount
       user {
         id
         username
         imagePath
-      }
-      comments {
-        id
-        body
-        repliesCount
-        user {
-          id
-          username
-          imagePath
-        }
       }
     }
   }

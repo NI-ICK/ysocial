@@ -4,7 +4,7 @@ import { AuthService } from '../../../features/auth/auth-service/auth.service'
 import { TestBed } from '@angular/core/testing'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { AuthEffects } from '../auth.effects'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import * as AuthActions from '../auth.actions'
 import { of, throwError, toArray } from 'rxjs'
 

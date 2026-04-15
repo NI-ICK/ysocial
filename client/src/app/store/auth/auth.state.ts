@@ -1,5 +1,5 @@
 import { AuthStatus } from '../../utils/auth-status.enum'
-import { User } from '../../utils/user.interface'
+import { User } from '../../utils/interfaces/user.interface'
 
 export interface AuthState {
   user: User | null

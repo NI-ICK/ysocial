@@ -6,7 +6,7 @@ import {
   LOGOUT_USER,
   REGISTER_USER,
 } from '../../../graphql/auth.operations'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import { tap } from 'rxjs'
 
 @Injectable({

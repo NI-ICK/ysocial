@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store'
 import { initialState, postsAdapter, PostsState } from './posts.state'
 import * as PostsActions from './posts.actions'
-import { Post } from '../../utils/post.interface'
+import { Post } from '../../utils/interfaces/post.interface'
 
 const updatePost = (id: string, changes: Partial<Post>, state: PostsState) => {
   return postsAdapter.updateOne({ id, changes }, state)
@@ -93,5 +93,20 @@ export const postsReducer = createReducer(
     const { [postId]: _, ...rest } = state.likingPost
 
     return { ...state, likingPost: rest }
+  }),
+  on(PostsActions.incrementCommentsCount, (state, { postId }) => {
+    const post = state.entities[postId]
+
+    if (!post) return state
+
+    return postsAdapter.updateOne(
+      {
+        id: postId,
+        changes: {
+          commentsCount: (post?.commentsCount || 0) + 1,
+        },
+      },
+      state
+    )
   })
 )

@@ -24,14 +24,20 @@
   .user {
     display: flex;
     align-items: center;
-    gap: 1em;
-    cursor: pointer;
     padding-bottom: 1em;
 
     p {
+      font-weight: bold;
+      color: grey;
+      margin-left: 0.5em;
+    }
+
+    a {
       position: relative;
       color: $accent-1;
       font-weight: bold;
+      margin-left: 1em;
+      text-decoration: none;
 
       &:hover {
         color: $accent-2;
@@ -53,6 +59,7 @@
       height: 2.5em;
       border-radius: 100%;
       outline: 0.15em solid $border;
+      cursor: pointer;
     }
   }
 
@@ -109,6 +116,7 @@
 .content {
   .body {
     margin-bottom: 0.5em;
+    overflow-wrap: anywhere;
   }
 
   img {
@@ -127,6 +135,25 @@
   margin-bottom: 1em;
   font-size: 0.8em;
   color: darkgray;
+}
+
+.footer {
+  cursor: default;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-top: 1em;
+
+  div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+  }
+
+  p {
+    margin-left: 0.5em;
+  }
 }
 
 .confirmation {

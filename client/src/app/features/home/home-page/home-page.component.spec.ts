@@ -3,7 +3,7 @@ import { HomePageComponent } from './home-page.component'
 import { Component, Input } from '@angular/core'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { MemoizedSelector } from '@ngrx/store'
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import {
   selectAllPosts,
   selectPostsLoading,

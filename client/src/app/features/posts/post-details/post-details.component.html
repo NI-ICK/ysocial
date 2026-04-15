@@ -1,9 +1,14 @@
 <div class="container">
   <div class="post" *ngIf="post$ | async as post">
     <div class="details">
-      <div class="user" [routerLink]="['/', post.user.username]">
-        <img [src]="post.user.imagePath" default="profile" />
-        <p>{{ post.user.username }}</p>
+      <div class="user">
+        <img
+          [src]="post.user.imagePath"
+          default="profile"
+          [routerLink]="['/', post.user.username]"
+        />
+        <a [routerLink]="['/', post.user.username]">{{ post.user.username }}</a>
+        <p>• {{ timeAgo(post.createdAt) }}</p>
       </div>
       <ng-container *ngIf="currentUser$ | async as currentUser">
         <span
@@ -21,9 +26,30 @@
       <p class="edited" *ngIf="post.createdAt !== post.updatedAt">(edited)</p>
       <img *ngIf="post.image" [src]="post.image" default="post" />
     </div>
+    <div></div>
     <p class="date">
       {{ formatDate(post.createdAt) }}
     </p>
+    <div class="footer" (click)="$event.stopPropagation()">
+      <div>
+        <comment-icon></comment-icon>
+        <p>{{ post.commentsCount }}</p>
+      </div>
+
+      <div>
+        <like-icon
+          [isLiked]="post.likedByMe"
+          (click)="toggleLike()"
+        ></like-icon>
+        <p>{{ post.likesCount }}</p>
+      </div>
+    </div>
+    <create-comment-form [postId]="post.id"></create-comment-form>
+    <ng-container *ngIf="comments$ | async as postComments">
+      <div class="comments" *ngFor="let comment of postComments">
+        <comment-card [comment]="comment" [postId]="post.id"></comment-card>
+      </div>
+    </ng-container>
   </div>
 </div>
 

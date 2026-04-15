@@ -13,11 +13,14 @@
     <img [src]="post.user.imagePath" default="profile" />
   </div>
   <div class="content">
-    <a
-      [routerLink]="['/', post.user.username]"
-      (click)="$event.stopPropagation()"
-      >{{ post.user.username }}</a
-    >
+    <div class="top">
+      <a
+        [routerLink]="['/', post.user.username]"
+        (click)="$event.stopPropagation()"
+        >{{ post.user.username }}</a
+      >
+      <p>• {{ timeAgo(post.createdAt) }}</p>
+    </div>
     <p>
       {{ isExpanded() ? post.body : (post.body | slice : 0 : 200) }}
       <span

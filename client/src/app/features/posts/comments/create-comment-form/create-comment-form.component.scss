@@ -1,0 +1,49 @@
+@use "form-controls";
+@use "colors" as *;
+
+.container {
+  display: flex;
+  align-items: start;
+  justify-content: center;
+  margin-top: 1em;
+  margin-bottom: 1em;
+
+  .profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5em;
+    height: 2.5em;
+    overflow: hidden;
+    border-radius: 100%;
+    outline: 0.15em solid $border;
+
+    img {
+      height: 100%;
+      width: 100%;
+      border: none;
+      outline: none;
+      object-fit: cover;
+    }
+  }
+
+  .field {
+    padding: 0;
+  }
+
+  form {
+    padding: 0;
+    margin-left: 1em;
+  }
+
+  button {
+    width: fit-content;
+    margin-left: auto;
+    margin-top: 1em;
+  }
+
+  textarea {
+    resize: none;
+    overflow: hidden;
+  }
+}

@@ -4,7 +4,7 @@ import {
   ApolloTestingController,
   ApolloTestingModule,
 } from 'apollo-angular/testing'
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import {
   CREATE_POST,
   DELETE_POST,
@@ -13,7 +13,6 @@ import {
   GET_POST_BY_ID,
   TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
-import { togglePostLike } from '../../../store/posts/posts.actions'
 
 describe('PostsServiceService', () => {
   let service: PostsService

@@ -1,0 +1,74 @@
+<div class="comment">
+  <div class="container">
+    <div class="profile" [routerLink]="['/', comment.user.username]">
+      <img [src]="comment.user.imagePath" default="profile" />
+    </div>
+    <div class="content">
+      <div class="top">
+        <a
+          [routerLink]="['/', comment.user.username]"
+          (click)="$event.stopPropagation()"
+          >{{ comment.user.username }}</a
+        >
+        <p>• {{ timeAgo(comment.createdAt) }}</p>
+      </div>
+      <p>{{ comment.body }}</p>
+      <div class="footer" (click)="$event.stopPropagation()">
+        <div>
+          <comment-icon></comment-icon>
+          <button (click)="this.isReplyFormVisible = true">Reply</button>
+        </div>
+        <div>
+          <like-icon
+            [isLiked]="comment.likedByMe"
+            (click)="toggleLike()"
+          ></like-icon>
+          <p>{{ comment.likesCount }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <form
+    *ngIf="this.isReplyFormVisible"
+    [formGroup]="createReplyForm"
+    (ngSubmit)="handleFormSubmit()"
+  >
+    <div class="field">
+      <textarea
+        formControlName="body"
+        #textarea
+        placeholder="Write a reply"
+      ></textarea>
+    </div>
+    <div>
+      <button (click)="this.isReplyFormVisible = false">Cancel</button>
+      <button type="submit">Post</button>
+    </div>
+  </form>
+  <div (click)="expandReplies()">
+    <p
+      *ngIf="comment.repliesCount === 1 && !areRepliesExpanded()"
+      class="show-replies"
+    >
+      Show 1 reply
+    </p>
+    <p
+      *ngIf="comment.repliesCount > 1 && !areRepliesExpanded()"
+      class="show-replies"
+    >
+      Show {{ comment.repliesCount }} replies
+    </p>
+  </div>
+  <ng-container *ngIf="areRepliesExpanded() && (replies$ | async) as replies">
+    <div class="replies" *ngFor="let reply of replies">
+      <comment-card [comment]="reply" [postId]="this.postId"></comment-card>
+    </div>
+  </ng-container>
+  <div
+    class="reply-bar"
+    *ngIf="areRepliesExpanded()"
+    (click)="collapseReplies()"
+  >
+    <div class="bar"></div>
+  </div>
+</div>

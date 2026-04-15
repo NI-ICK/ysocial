@@ -4,10 +4,11 @@ import { UiStateService } from '../../../shared/services/ui-state-service/ui-sta
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { selectIsLiking } from '../../../store/posts/posts.selectors'
 import { selectCurrentUser } from '../../../store/auth/auth.selectors'
-import { User } from '../../../utils/user.interface'
-import { Post } from '../../../utils/post.interface'
+import { User } from '../../../utils/interfaces/user.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import { RouterModule } from '@angular/router'
 import { togglePostLike } from '../../../store/posts/posts.actions'
+import { forkJoin, take } from 'rxjs'
 
 describe('PostCardComponent', () => {
   let component: PostCardComponent
@@ -22,8 +23,8 @@ describe('PostCardComponent', () => {
 
   beforeEach(async () => {
     uiStateService = {
-      isExpanded: jest.fn(),
-      setExpanded: jest.fn(),
+      isPostExpanded: jest.fn(),
+      setExpandedPost: jest.fn(),
     }
 
     await TestBed.configureTestingModule({
@@ -56,16 +57,17 @@ describe('PostCardComponent', () => {
   })
 
   describe('ngOnInit', () => {
-    it('should set isLiking', () => {
+    it('should assign isLiking and currentUser', (done) => {
       component.ngOnInit()
 
-      expect(component.isLiking).toEqual(false)
-    })
-
-    it('should set currentUser', () => {
-      component.ngOnInit()
-
-      expect(component.currentUser).toEqual(mockUser)
+      forkJoin({
+        isLiking: component.isLiking$.pipe(take(1)),
+        currentUser: component.currentUser$.pipe(take(1)),
+      }).subscribe(({ isLiking, currentUser }) => {
+        expect(isLiking).toEqual(false)
+        expect(currentUser).toEqual(mockUser)
+        done()
+      })
     })
   })
 
@@ -73,7 +75,7 @@ describe('PostCardComponent', () => {
     it('should call service', () => {
       component.handleExpand()
 
-      expect(uiStateService.setExpanded).toHaveBeenCalled()
+      expect(uiStateService.setExpandedPost).toHaveBeenCalled()
     })
   })
 
@@ -81,7 +83,7 @@ describe('PostCardComponent', () => {
     it('should call service', () => {
       component.isExpanded()
 
-      expect(uiStateService.isExpanded).toHaveBeenCalled()
+      expect(uiStateService.isPostExpanded).toHaveBeenCalled()
     })
   })
 

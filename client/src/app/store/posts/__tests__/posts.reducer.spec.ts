@@ -1,4 +1,4 @@
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import { postsReducer } from '../posts.reducer'
 import { initialState, postsAdapter, PostsState } from '../posts.state'
 import * as PostsActions from '../posts.actions'
@@ -14,6 +14,7 @@ describe('Posts Reducer', () => {
     image: null,
     likedByMe: false,
     likesCount: 0,
+    commentsCount: 0,
   } as Post
   const tmpPost = {
     id: 'tmp-5',
@@ -229,5 +230,18 @@ describe('Posts Reducer', () => {
 
       expect(state.likingPost).toEqual({ '2': true })
     })
+  })
+
+  describe('incrementCommentsCount', () => {
+    const state = postsAdapter.addOne(mockPost, initialState)
+    const action = PostsActions.incrementCommentsCount({ postId: '3' })
+    const updatedState = postsReducer(state, action)
+
+    const expectedState = postsAdapter.addOne(
+      { ...mockPost, commentsCount: 1 },
+      initialState
+    )
+
+    expect(updatedState).toEqual(expectedState)
   })
 })

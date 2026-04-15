@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store'
-import { Post } from '../../utils/post.interface'
+import { Post } from '../../utils/interfaces/post.interface'
 
 // ----- Load Posts -----
 export const loadPosts = createAction('[Posts] Load Posts')
@@ -86,4 +86,10 @@ export const togglePostLikeSuccess = createAction(
 export const togglePostLikeFailure = createAction(
   '[Posts] Toggle Post Like Failure',
   props<{ error: string }>()
+)
+
+// ----- Increment Comments Count -----
+export const incrementCommentsCount = createAction(
+  '[Posts] Increment Comments Count',
+  props<{ postId: string }>()
 )

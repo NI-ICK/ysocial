@@ -3,12 +3,12 @@ import { PostsEffects } from '../posts.effects'
 import { provideMockActions } from '@ngrx/effects/testing'
 import { PopupService } from '../../../shared/popup/popup.service'
 import { TestBed } from '@angular/core/testing'
-import { Post } from '../../../utils/post.interface'
+import { Post } from '../../../utils/interfaces/post.interface'
 import * as PostsActions from '../posts.actions'
 import { PostsService } from '../../../features/posts/posts-service/posts.service'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { selectCurrentUser } from '../../auth/auth.selectors'
-import { User } from '../../../utils/user.interface'
+import { User } from '../../../utils/interfaces/user.interface'
 import { Actions } from '@ngrx/effects'
 
 describe('Posts Effects', () => {
@@ -83,7 +83,7 @@ describe('Posts Effects', () => {
   })
 
   describe('createPost', () => {
-    it('should dispatch createPostSuccess and and replaceOptimisticPost then call popupService when postsService.createPost succeeds', (done) => {
+    it('should dispatch createPostSuccess and replaceOptimisticPost then call popupService when postsService.createPost succeeds', (done) => {
       store.overrideSelector(selectCurrentUser, { id: '1' } as User)
       ;(postsService.createPost as jest.Mock).mockReturnValue(
         of({ data: { createPost: postMock } })
@@ -147,7 +147,7 @@ describe('Posts Effects', () => {
         const remove = actions[1] as ReturnType<
           typeof PostsActions.removeOptimisticPost
         >
-        const create = actions[2] as ReturnType<
+        const createFailure = actions[2] as ReturnType<
           typeof PostsActions.createPostFailure
         >
 
@@ -158,8 +158,8 @@ describe('Posts Effects', () => {
         expect(remove.type).toEqual('[Posts] Remove Optimistic Post')
         expect(remove.tmpId).toMatch(/^tmp-/)
 
-        expect(create.type).toEqual('[Posts] Create Post Failure')
-        expect(create.error).toEqual('test error')
+        expect(createFailure.type).toEqual('[Posts] Create Post Failure')
+        expect(createFailure.error).toEqual('test error')
 
         done()
       })
