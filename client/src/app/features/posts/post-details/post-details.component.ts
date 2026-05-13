@@ -40,11 +40,15 @@ import { LikeIconComponent } from '../../../shared/icons/like-icon/like-icon.com
 import { CommentCardComponent } from '../comments/comment-card/comment-card.component'
 import { timeAgo } from '../../../utils/time-ago'
 import { CreateCommentFormComponent } from '../comments/create-comment-form/create-comment-form.component'
-import { selectCommentsForPost } from '../../../store/comments/comments.selectors'
+import {
+  selectCommentsForPost,
+  selectLoadingComments,
+} from '../../../store/comments/comments.selectors'
 import { Comment } from '../../../utils/interfaces/comment.interface'
+import { LoadingComponent } from '../../../shared/loading/loading.component'
 
 @Component({
-  selector: 'app-post-details',
+  selector: 'post-details',
   imports: [
     NgIf,
     RouterLink,
@@ -57,6 +61,7 @@ import { Comment } from '../../../utils/interfaces/comment.interface'
     LikeIconComponent,
     CommentCardComponent,
     CreateCommentFormComponent,
+    LoadingComponent,
   ],
   templateUrl: './post-details.component.html',
   styleUrl: './post-details.component.scss',
@@ -66,6 +71,7 @@ export class PostDetailsComponent implements OnInit, OnDestroy {
   comments$: Observable<Comment[]> = new Observable()
   currentUser$: Observable<User | null> = new Observable()
   isLiking$: Observable<boolean> = of(false)
+  loadingComments$ = new Observable<boolean>()
   optionsVisible = false
   confirmationVisible = false
   editVisible = false
@@ -108,6 +114,7 @@ export class PostDetailsComponent implements OnInit, OnDestroy {
     this.post$ = this.store.select(selectCurrentPost)
     this.currentUser$ = this.store.select(selectCurrentUser)
     this.comments$ = this.store.select(selectCommentsForPost(postId))
+    this.loadingComments$ = this.store.select(selectLoadingComments)
 
     this.isLiking$ = this.post$.pipe(
       filter((post): post is Post => !!post),

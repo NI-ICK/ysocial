@@ -10,6 +10,18 @@ describe('Comments Reducer', () => {
     )
   })
 
+  describe('loadComments', () => {
+    it('should set loadingRootComments to true', () => {
+      const action = CommentsActions.loadComments({ postId: '1' })
+
+      const state = commentsReducer(initialState, action)
+
+      const expectedState = { ...initialState, loadingRootComments: true }
+
+      expect(state).toEqual(expectedState)
+    })
+  })
+
   describe('loadCommentsSuccess', () => {
     it('should populate postComments, replies and entities correctly', () => {
       const comments = [

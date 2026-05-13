@@ -30,7 +30,7 @@ describe('Posts Effects', () => {
       showPopup: jest.fn(),
     }
     postsService = {
-      getAllPosts: jest.fn(),
+      getPosts: jest.fn(),
       createPost: jest.fn(),
       getPostById: jest.fn(),
       deletePost: jest.fn(),
@@ -52,12 +52,12 @@ describe('Posts Effects', () => {
   })
 
   describe('loadPosts', () => {
-    it('should dispatch loadPostsSuccess when postsService.getAllPosts succeeds', (done) => {
-      ;(postsService.getAllPosts as jest.Mock).mockReturnValue(
-        of({ data: { getAllPosts: [postMock] } })
+    it('should dispatch loadPostsSuccess when postsService.getPosts succeeds', (done) => {
+      ;(postsService.getPosts as jest.Mock).mockReturnValue(
+        of({ data: { getPosts: [postMock] } })
       )
 
-      actions$ = of(PostsActions.loadPosts())
+      actions$ = of(PostsActions.loadPosts({ offset: 0 }))
 
       effects.loadPosts$.subscribe((action) => {
         expect(action).toEqual(
@@ -67,11 +67,11 @@ describe('Posts Effects', () => {
       })
     })
 
-    it('should dispatch loadPostsFailure when postsService.getAllPosts fails', (done) => {
-      ;(postsService.getAllPosts as jest.Mock).mockReturnValue(
+    it('should dispatch loadPostsFailure when postsService.getPosts fails', (done) => {
+      ;(postsService.getPosts as jest.Mock).mockReturnValue(
         throwError(() => new Error('test error'))
       )
-      actions$ = of(PostsActions.loadPosts())
+      actions$ = of(PostsActions.loadPosts({ offset: 0 }))
 
       effects.loadPosts$.subscribe((action) => {
         expect(action).toEqual(

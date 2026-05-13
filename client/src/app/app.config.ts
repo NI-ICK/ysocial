@@ -23,6 +23,8 @@ import { AuthEffects } from './store/auth/auth.effects'
 import { authReducer } from './store/auth/auth.reducer'
 import { commentsReducer } from './store/comments/comments.reducer'
 import { CommentsEffects } from './store/comments/comments.effects'
+import { usersReducer } from './store/users/users.reducer'
+import { UsersEffects } from './store/users/users.effects'
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -42,9 +44,10 @@ export const appConfig: ApplicationConfig = {
       auth: authReducer,
       posts: postsReducer,
       comments: commentsReducer,
+      users: usersReducer,
     }),
     provideStoreDevtools(),
-    provideEffects([PostsEffects, AuthEffects, CommentsEffects]),
+    provideEffects([PostsEffects, AuthEffects, CommentsEffects, UsersEffects]),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
   ],
 }

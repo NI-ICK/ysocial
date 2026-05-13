@@ -6,6 +6,7 @@ export interface PostsState extends EntityState<Post> {
   postsLoading: boolean
   error: string | null
   likingPost: Record<string, boolean>
+  noMorePosts: boolean
 }
 
 export const postsAdapter = createEntityAdapter<Post>({
@@ -18,4 +19,5 @@ export const initialState: PostsState = postsAdapter.getInitialState({
   postsLoading: false,
   error: null,
   likingPost: {},
+  noMorePosts: false,
 })

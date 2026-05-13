@@ -4,18 +4,19 @@ import * as PostsSelectors from '../posts.selectors'
 
 describe('Posts Selectors', () => {
   const mockPosts = [
-    { id: '1', body: 'test' } as Post,
-    { id: '2', body: 'test' } as Post,
+    { id: '1', body: 'test', likedByMe: false } as Post,
+    { id: '2', body: 'test', likedByMe: false } as Post,
   ]
 
   const mockState: PostsState = {
     ...postsAdapter.setAll(mockPosts, postsAdapter.getInitialState()),
     currentPostId: '1',
     postsLoading: false,
+    noMorePosts: false,
     error: null,
     likingPost: { '1': true },
   }
-  const appState = { posts: mockState }
+  const appState = { posts: mockState, auth: { user: null } }
 
   it('should select posts feature state', () => {
     const result = PostsSelectors.selectPostsState(appState)
@@ -68,5 +69,11 @@ describe('Posts Selectors', () => {
     const result = PostsSelectors.selectIsLikingPost('1')(appState)
 
     expect(result).toEqual(true)
+  })
+
+  it('should select noMorePosts', () => {
+    const result = PostsSelectors.selectNoMorePosts(appState)
+
+    expect(result).toEqual(false)
   })
 })

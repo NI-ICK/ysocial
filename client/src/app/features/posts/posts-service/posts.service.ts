@@ -3,15 +3,15 @@ import {
   CREATE_POST,
   DELETE_POST,
   EDIT_POST,
-  GET_ALL_POSTS,
+  GET_POSTS,
   GET_POST_BY_ID,
   TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
 import { Post } from '../../../utils/interfaces/post.interface'
 import { Apollo } from 'apollo-angular'
 
-interface GetAllPostsResponse {
-  getAllPosts: Post[]
+interface GetPostsResponse {
+  getPosts: Post[]
 }
 
 interface CreatePostResponse {
@@ -45,9 +45,11 @@ interface TogglePostLikeResponse {
 export class PostsService {
   constructor(private apollo: Apollo) {}
 
-  getAllPosts() {
-    return this.apollo.query<GetAllPostsResponse>({
-      query: GET_ALL_POSTS,
+  getPosts(offset: number) {
+    return this.apollo.query<GetPostsResponse>({
+      query: GET_POSTS,
+      variables: { limit: 5, offset },
+      fetchPolicy: 'network-only',
     })
   }
 

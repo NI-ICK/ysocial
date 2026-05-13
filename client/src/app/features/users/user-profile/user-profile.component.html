@@ -1,0 +1,55 @@
+<div class="container">
+  <div class="content" *ngIf="userProfile$ | async as userProfile">
+    <div class="profile">
+      <div class="wrapper">
+        <img [src]="userProfile.imagePath" />
+        <div class="details">
+          <p>{{ userProfile.username }}</p>
+          <div class="follows">
+            <a [routerLink]="['followers']"
+              ><span>{{ userProfile.followersCount }}</span> Followers</a
+            >
+            <a [routerLink]="['following']"
+              ><span>{{ userProfile.followingCount }}</span> Following</a
+            >
+          </div>
+        </div>
+        <ng-container *ngIf="currentUser$ | async as currentUser">
+          <button
+            data-testid="follow-btn"
+            *ngIf="currentUser.id !== userProfile.id"
+            [class]="userProfile.followedByMe ? 'following' : ''"
+            (click)="handleFollow()"
+          >
+            {{ userProfile.followedByMe ? "Following" : "Follow" }}
+          </button>
+        </ng-container>
+      </div>
+      <p class="bio">{{ userProfile.bio }}</p>
+    </div>
+    <div class="buttons">
+      <button
+        data-testid="state-btn-created"
+        [class]="postsState === 'created' ? 'active' : ''"
+        (click)="handleButtonClick('created')"
+      >
+        Created</button
+      ><button
+        data-testid="state-btn-liked"
+        [class]="postsState === 'liked' ? 'active' : ''"
+        (click)="handleButtonClick('liked')"
+      >
+        Liked
+      </button>
+    </div>
+    <created-posts
+      [hidden]="postsState !== 'created'"
+      [userId]="userProfile.id"
+    ></created-posts>
+
+    <liked-posts
+      [hidden]="postsState !== 'liked'"
+      [userId]="userProfile.id"
+    ></liked-posts>
+  </div>
+</div>

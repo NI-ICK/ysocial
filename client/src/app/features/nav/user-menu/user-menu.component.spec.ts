@@ -3,15 +3,20 @@ import { UserMenuComponent } from './user-menu.component'
 import { By } from '@angular/platform-browser'
 import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { logoutUser } from '../../../store/auth/auth.actions'
+import { selectCurrentUser } from '../../../store/auth/auth.selectors'
+import { User } from '../../../utils/interfaces/user.interface'
+import { take } from 'rxjs'
+import { Router, RouterModule } from '@angular/router'
 
 describe('UserMenuComponent', () => {
   let component: UserMenuComponent
   let fixture: ComponentFixture<UserMenuComponent>
   let store: MockStore
+  let router: Router
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserMenuComponent],
+      imports: [UserMenuComponent, RouterModule.forRoot([])],
       providers: [provideMockStore()],
     }).compileComponents()
 
@@ -22,10 +27,19 @@ describe('UserMenuComponent', () => {
     fixture.detectChanges()
 
     jest.spyOn(store, 'dispatch')
+    router = TestBed.inject(Router)
+    store.overrideSelector(selectCurrentUser, { username: 'test' } as User)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  it('should select currentUser from store', (done) => {
+    component.currentUser$.pipe(take(1)).subscribe((user) => {
+      expect(user?.username).toEqual('test')
+      done()
+    })
   })
 
   describe('logoutUser', () => {

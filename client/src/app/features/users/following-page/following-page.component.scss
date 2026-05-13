@@ -1,0 +1,67 @@
+@use "colors" as *;
+
+.container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 4em); // Navbar
+}
+
+.content {
+  width: 40em;
+  background-color: black;
+  border-left: 0.1em solid $border;
+  border-right: 0.1em solid $border;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2em;
+  padding: 1em;
+
+  a {
+    text-decoration: none;
+    font-size: 1.5em;
+    color: white;
+    border-radius: 5em;
+
+    &:hover {
+      color: $accent-1;
+    }
+  }
+
+  .active {
+    position: relative;
+    text-decoration: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 0.1em;
+      background-color: $accent-2;
+    }
+
+    &:link,
+    &:visited {
+      color: $accent-1;
+    }
+
+    &:hover {
+      color: $accent-2;
+    }
+  }
+}
+
+.info {
+  margin-top: 2em;
+  text-align: center;
+  font-size: 1.5em;
+  color: $accent-1;
+}

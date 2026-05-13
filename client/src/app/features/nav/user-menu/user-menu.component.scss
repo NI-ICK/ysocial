@@ -1,6 +1,10 @@
 @use "colors" as *;
 
 .content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
   position: fixed;
   top: 3.7em;
   right: 1em;
@@ -10,14 +14,27 @@
   border: 0.1em solid $border;
   z-index: 500;
 
-  p {
-    cursor: pointer;
+  a {
+    text-align: center;
+    text-decoration: none;
+    border-radius: 0.5em;
     padding: 0.5em 1em;
-    font-size: 0.9em;
+    color: white;
+    width: 100%;
 
     &:hover {
       background-color: $hover;
-      border-radius: 0.5em;
+    }
+  }
+
+  p {
+    cursor: pointer;
+    padding: 0.5em 1em;
+    color: $danger;
+    border-radius: 0.5em;
+
+    &:hover {
+      background-color: $hover;
     }
   }
 }

@@ -1,0 +1,31 @@
+<div class="container">
+  <div class="content">
+    <div class="links">
+      <a [routerLink]="['/', username, 'followers']">Followers</a>
+      <a [routerLink]="['/', username, 'following']" class="active"
+        >Following</a
+      >
+    </div>
+    <ng-container *ngIf="followingLoading$ | async">
+      <loading></loading>
+    </ng-container>
+
+    <ng-container *ngIf="following$ | async as following">
+      <ng-container *ngFor="let user of following">
+        <user-card [user]="user"></user-card>
+      </ng-container>
+
+      <ng-container *ngIf="noMoreFollowing$ | async as noMore">
+        <p *ngIf="!following.length && noMore" class="info">
+          Nothing to see here...
+        </p>
+      </ng-container>
+    </ng-container>
+    <div
+      infiniteScroll
+      [infiniteScrollThrottle]="1000"
+      [infiniteScrollDistance]="5"
+      (scrolled)="onScroll()"
+    ></div>
+  </div>
+</div>

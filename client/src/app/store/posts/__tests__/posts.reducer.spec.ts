@@ -28,7 +28,10 @@ describe('Posts Reducer', () => {
 
   describe('loadPosts', () => {
     it('should set loading to true on loadPosts', () => {
-      const state = postsReducer(initialState, PostsActions.loadPosts())
+      const state = postsReducer(
+        initialState,
+        PostsActions.loadPosts({ offset: 0 })
+      )
 
       expect(state.postsLoading).toEqual(true)
     })
@@ -41,7 +44,8 @@ describe('Posts Reducer', () => {
 
       const expectedState = postsAdapter.setAll(mockPosts, {
         ...initialState,
-        loading: false,
+        postsLoading: false,
+        noMorePosts: true,
       })
 
       expect(state).toEqual(expectedState)

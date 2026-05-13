@@ -5,6 +5,7 @@ import * as PostsActions from './posts.actions'
 import {
   catchError,
   concat,
+  concatMap,
   exhaustMap,
   filter,
   from,
@@ -32,11 +33,11 @@ export class PostsEffects {
   loadPosts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PostsActions.loadPosts),
-      switchMap(() =>
-        this.postsService.getAllPosts().pipe(
+      concatMap(({ offset }) =>
+        this.postsService.getPosts(offset).pipe(
           map((result) =>
             PostsActions.loadPostsSuccess({
-              posts: result.data?.getAllPosts || [],
+              posts: result.data?.getPosts || [],
             })
           ),
           catchError((err) =>

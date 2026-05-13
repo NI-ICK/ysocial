@@ -2,7 +2,10 @@ import { createAction, props } from '@ngrx/store'
 import { Post } from '../../utils/interfaces/post.interface'
 
 // ----- Load Posts -----
-export const loadPosts = createAction('[Posts] Load Posts')
+export const loadPosts = createAction(
+  '[Posts] Load Posts',
+  props<{ offset: number }>()
+)
 export const loadPostsSuccess = createAction(
   '[Posts] Load Posts Success',
   props<{ posts: Post[] }>()

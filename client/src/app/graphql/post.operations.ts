@@ -19,9 +19,9 @@ export const CREATE_POST = gql`
   }
 `
 
-export const GET_ALL_POSTS = gql`
-  query {
-    getAllPosts {
+export const GET_POSTS = gql`
+  query getPosts($limit: Int!, $offset: Int!) {
+    getPosts(limit: $limit, offset: $offset) {
       id
       body
       image
@@ -91,6 +91,46 @@ export const TOGGLE_POST_LIKE = gql`
   mutation togglePostLike($postId: String!) {
     togglePostLike(postId: $postId) {
       addLike
+    }
+  }
+`
+
+export const GET_POSTS_CREATED_BY_USER = gql`
+  query getPostsCreatedByUser($userId: String!, $limit: Int!, $offset: Int!) {
+    getPostsCreatedByUser(userId: $userId, limit: $limit, offset: $offset) {
+      id
+      body
+      image
+      createdAt
+      updatedAt
+      likesCount
+      likedByMe
+      commentsCount
+      user {
+        id
+        username
+        imagePath
+      }
+    }
+  }
+`
+
+export const GET_POSTS_LIKED_BY_USER = gql`
+  query getPostsLikedByUser($userId: String!, $limit: Int!, $offset: Int!) {
+    getPostsLikedByUser(userId: $userId, limit: $limit, offset: $offset) {
+      id
+      body
+      image
+      createdAt
+      updatedAt
+      likesCount
+      likedByMe
+      commentsCount
+      user {
+        id
+        username
+        imagePath
+      }
     }
   }
 `

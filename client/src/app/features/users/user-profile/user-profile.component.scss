@@ -1,0 +1,125 @@
+@use "colors" as *;
+
+.container {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: calc(100vh - 4em); // Navbar
+}
+
+.content {
+  width: 40em;
+  background-color: black;
+  border-left: 0.1em solid $border;
+  border-right: 0.1em solid $border;
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5em;
+}
+
+.profile {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+  border-bottom: 0.1em solid $border;
+
+  button {
+    margin-left: auto;
+    background-color: $accent-1;
+    padding: 0.5em 1em;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 2em;
+    cursor: pointer;
+
+    &:hover {
+      background-color: $accent-2;
+    }
+
+    &.following {
+      background-color: black;
+      color: white;
+      border: 0.15em solid white;
+
+      &:hover {
+        background-color: white;
+        color: black;
+      }
+    }
+  }
+
+  .details {
+    p {
+      color: $accent-1;
+      font-size: 1.2em;
+    }
+  }
+
+  .bio {
+    font-size: 0.9em;
+  }
+
+  .follows {
+    display: flex;
+    gap: 1em;
+
+    a {
+      text-decoration: none;
+      color: $accent-1;
+
+      &:hover {
+        color: $accent-2;
+      }
+
+      span {
+        color: white;
+      }
+    }
+  }
+
+  img {
+    width: 5em;
+    height: 5em;
+    border-radius: 100%;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.5em;
+  margin-bottom: 1em;
+
+  button {
+    position: relative;
+    background-color: black;
+    color: white;
+    outline: none;
+    border: none;
+    font-size: 1.2em;
+    padding: 0.5em 1em;
+    cursor: pointer;
+
+    &.active {
+      color: $accent-1;
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0.3em;
+        left: 50%;
+        width: 75%;
+        height: 0.15em;
+        background-color: $accent-1;
+        transform: translateX(-50%);
+      }
+    }
+  }
+}

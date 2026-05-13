@@ -6,13 +6,18 @@ import { provideMockActions } from '@ngrx/effects/testing'
 import { AuthEffects } from '../auth.effects'
 import { User } from '../../../utils/interfaces/user.interface'
 import * as AuthActions from '../auth.actions'
-import { of, throwError, toArray } from 'rxjs'
+import * as PostsActions from '../../posts/posts.actions'
+import * as CommentsActions from '../../comments/comments.actions'
+import { of, take, throwError, toArray } from 'rxjs'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
+import { selectCurrentPostId } from '../../posts/posts.selectors'
 
 describe('Auth Effects', () => {
   let actions$: Actions
   let effects: AuthEffects
   let authService: Partial<AuthService>
   let popupService: Partial<PopupService>
+  let mockStore: MockStore
 
   const mockUser = {
     id: '1',
@@ -37,10 +42,14 @@ describe('Auth Effects', () => {
         { provide: AuthService, useValue: authService },
         { provide: PopupService, useValue: popupService },
         provideMockActions(() => actions$),
+        provideMockStore(),
       ],
     })
 
     effects = TestBed.inject(AuthEffects)
+    mockStore = TestBed.inject(MockStore)
+
+    mockStore.overrideSelector(selectCurrentPostId, '1')
   })
 
   describe('loginUser', () => {
@@ -75,7 +84,7 @@ describe('Auth Effects', () => {
         AuthActions.loginUser({ email: 'test@gmail.com', password: 'test' })
       )
 
-      effects.loginUser$.subscribe((action) => {
+      effects.loginUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(
           AuthActions.loginUserFailure({ error: 'test error' })
         )
@@ -84,10 +93,34 @@ describe('Auth Effects', () => {
     })
 
     describe('loginUserSuccess', () => {
+      it('should dispatch only loadPosts if currentPostId is null', (done) => {
+        mockStore.overrideSelector(selectCurrentPostId, null)
+        mockStore.refreshState()
+
+        actions$ = of(AuthActions.loginUserSuccess())
+
+        effects.loginUserSuccess$.pipe(take(1)).subscribe((action) => {
+          expect(action).toEqual(PostsActions.loadPosts({ offset: 0 }))
+          done()
+        })
+      })
+
+      it('should dispatch loadPosts and loadComments', (done) => {
+        actions$ = of(AuthActions.loginUserSuccess())
+
+        effects.loginUserSuccess$.pipe(toArray()).subscribe((actions) => {
+          expect(actions[0]).toEqual(PostsActions.loadPosts({ offset: 0 }))
+          expect(actions[1]).toEqual(
+            CommentsActions.loadComments({ postId: '1' })
+          )
+          done()
+        })
+      })
+
       it('should call popupService', (done) => {
         actions$ = of(AuthActions.loginUserSuccess())
 
-        effects.loginUserSuccess$.subscribe(() => {
+        effects.loginUserSuccess$.pipe(take(1)).subscribe(() => {
           expect(popupService.showPopup).toHaveBeenCalledWith(
             'Sign In Successfull'
           )
@@ -100,7 +133,7 @@ describe('Auth Effects', () => {
       it('should call popupService', (done) => {
         actions$ = of(AuthActions.loginUserFailure({ error: 'test error' }))
 
-        effects.loginUserFailure$.subscribe(() => {
+        effects.loginUserFailure$.pipe(take(1)).subscribe(() => {
           expect(popupService.showPopup).toHaveBeenCalledWith('test error')
           done()
         })
@@ -122,7 +155,7 @@ describe('Auth Effects', () => {
         })
       )
 
-      effects.registerUser$.subscribe((action) => {
+      effects.registerUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(AuthActions.registerUserSuccess())
         done()
       })
@@ -141,7 +174,7 @@ describe('Auth Effects', () => {
         })
       )
 
-      effects.registerUser$.subscribe((action) => {
+      effects.registerUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(
           AuthActions.registerUserFailure({ error: 'test error' })
         )
@@ -153,7 +186,7 @@ describe('Auth Effects', () => {
       it('should call popupService', (done) => {
         actions$ = of(AuthActions.registerUserSuccess())
 
-        effects.registerUserSuccess$.subscribe(() => {
+        effects.registerUserSuccess$.pipe(take(1)).subscribe(() => {
           expect(popupService.showPopup).toHaveBeenCalledWith(
             'Sign Up Successfull'
           )
@@ -166,7 +199,7 @@ describe('Auth Effects', () => {
       it('should call popupService', (done) => {
         actions$ = of(AuthActions.registerUserFailure({ error: 'test error' }))
 
-        effects.registerUserFailure$.subscribe(() => {
+        effects.registerUserFailure$.pipe(take(1)).subscribe(() => {
           expect(popupService.showPopup).toHaveBeenCalledWith('test error')
           done()
         })
@@ -182,7 +215,7 @@ describe('Auth Effects', () => {
 
       actions$ = of(AuthActions.loadUser())
 
-      effects.loadUser$.subscribe((action) => {
+      effects.loadUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(AuthActions.loadUserSuccess({ user: mockUser }))
         done()
       })
@@ -195,7 +228,7 @@ describe('Auth Effects', () => {
 
       actions$ = of(AuthActions.loadUser())
 
-      effects.loadUser$.subscribe((action) => {
+      effects.loadUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(
           AuthActions.loadUserFailure({ error: 'User not found' })
         )
@@ -210,7 +243,7 @@ describe('Auth Effects', () => {
 
       actions$ = of(AuthActions.loadUser())
 
-      effects.loadUser$.subscribe((action) => {
+      effects.loadUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(
           AuthActions.loadUserFailure({ error: 'test error' })
         )
@@ -227,7 +260,7 @@ describe('Auth Effects', () => {
 
       actions$ = of(AuthActions.logoutUser())
 
-      effects.logoutUser$.subscribe((action) => {
+      effects.logoutUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(AuthActions.logoutUserSuccess())
         done()
       })
@@ -240,7 +273,7 @@ describe('Auth Effects', () => {
 
       actions$ = of(AuthActions.logoutUser())
 
-      effects.logoutUser$.subscribe((action) => {
+      effects.logoutUser$.pipe(take(1)).subscribe((action) => {
         expect(action).toEqual(
           AuthActions.logoutUserFailure({ error: 'test error' })
         )

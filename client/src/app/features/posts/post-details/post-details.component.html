@@ -45,10 +45,21 @@
       </div>
     </div>
     <create-comment-form [postId]="post.id"></create-comment-form>
-    <ng-container *ngIf="comments$ | async as postComments">
-      <div class="comments" *ngFor="let comment of postComments">
-        <comment-card [comment]="comment" [postId]="post.id"></comment-card>
-      </div>
+
+    <ng-container *ngIf="post.commentsCount">
+      <ng-container *ngIf="loadingComments$ | async">
+        <loading></loading>
+      </ng-container>
+
+      <ng-container *ngIf="comments$ | async as postComments">
+        <div class="comments" *ngFor="let comment of postComments">
+          <comment-card [comment]="comment" [postId]="post.id"></comment-card>
+        </div>
+      </ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="!post.commentsCount">
+      <div class="info">Nothing to see here...</div>
     </ng-container>
   </div>
 </div>

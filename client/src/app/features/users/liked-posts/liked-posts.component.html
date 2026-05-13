@@ -1,0 +1,23 @@
+<div class="posts">
+  <ng-container *ngIf="likedPostsLoading$ | async">
+    <loading></loading>
+  </ng-container>
+
+  <ng-container *ngIf="likedPosts$ | async as likedPosts">
+    <ng-container *ngFor="let post of likedPosts">
+      <post-card [post]="post"></post-card>
+    </ng-container>
+
+    <ng-container *ngIf="noMoreLikedPosts$ | async as noMore">
+      <p *ngIf="!likedPosts.length && noMore" class="info">
+        Nothing to see here...
+      </p>
+    </ng-container>
+  </ng-container>
+  <div
+    infiniteScroll
+    [infiniteScrollThrottle]="1000"
+    [infiniteScrollDistance]="5"
+    (scrolled)="onScroll()"
+  ></div>
+</div>

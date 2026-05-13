@@ -31,6 +31,7 @@ export class CommentsService {
     return this.apollo.query<GetCommentsByPostIdResponse>({
       query: GET_COMMENTS_BY_POST_ID,
       variables: { id },
+      fetchPolicy: 'network-only',
     })
   }
 

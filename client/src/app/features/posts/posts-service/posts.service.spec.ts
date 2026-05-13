@@ -9,12 +9,12 @@ import {
   CREATE_POST,
   DELETE_POST,
   EDIT_POST,
-  GET_ALL_POSTS,
+  GET_POSTS,
   GET_POST_BY_ID,
   TOGGLE_POST_LIKE,
 } from '../../../graphql/post.operations'
 
-describe('PostsServiceService', () => {
+describe('PostsService', () => {
   let service: PostsService
   let apolloController: ApolloTestingController
 
@@ -34,15 +34,21 @@ describe('PostsServiceService', () => {
     expect(service).toBeTruthy()
   })
 
-  describe('getAllPosts', () => {
+  describe('getPosts', () => {
     it('should return array of posts', (done) => {
-      service.getAllPosts().subscribe((result) => {
-        expect(result.data?.getAllPosts).toEqual([postMock])
+      service.getPosts(0).subscribe((result) => {
+        expect(result.data?.getPosts).toEqual([postMock])
         done()
       })
 
-      const op = apolloController.expectOne(GET_ALL_POSTS)
-      op.flush({ data: { getAllPosts: [postMock] } })
+      const op = apolloController.expectOne(GET_POSTS)
+
+      expect(op.operation.variables).toEqual({
+        offset: 0,
+        limit: 5,
+      })
+
+      op.flush({ data: { getPosts: [postMock] } })
       apolloController.verify()
     })
   })

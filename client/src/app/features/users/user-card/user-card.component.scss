@@ -1,0 +1,88 @@
+@use "colors" as *;
+@use "sass:color";
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 1em;
+  padding: 1em;
+  border-bottom: 0.1em solid $border;
+
+  &:hover {
+    background-color: color.mix(black, white, 95%);
+  }
+
+  img {
+    height: 3em;
+    width: 3em;
+    border: none;
+    outline: none;
+    object-fit: cover;
+    border-radius: 100%;
+    margin-bottom: auto;
+  }
+
+  div {
+    height: 100%;
+    margin-bottom: auto;
+
+    a {
+      position: relative;
+      text-decoration: none;
+      font-weight: bold;
+      margin-bottom: auto;
+
+      &:visited,
+      &:link {
+        color: $accent-1;
+      }
+
+      &:hover {
+        color: $accent-2;
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 0.1em;
+          background-color: $accent-2;
+        }
+      }
+    }
+
+    p {
+      margin-top: 0.5em;
+      font-size: 0.8em;
+    }
+  }
+
+  button {
+    background-color: $accent-1;
+    padding: 0.5em 1em;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 2em;
+    cursor: pointer;
+    margin-left: auto;
+
+    &:hover {
+      background-color: $accent-2;
+    }
+
+    &.following {
+      background-color: black;
+      color: white;
+      border: 0.15em solid white;
+
+      &:hover {
+        background-color: white;
+        color: black;
+      }
+    }
+  }
+}

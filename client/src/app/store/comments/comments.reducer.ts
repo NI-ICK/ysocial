@@ -23,6 +23,10 @@ const updateComments = (
 
 export const commentsReducer = createReducer(
   initialState,
+  on(CommentsActions.loadComments, (state) => ({
+    ...state,
+    loadingRootComments: true,
+  })),
   on(CommentsActions.loadCommentsSuccess, (state, { comments, postId }) => {
     const updatedState = commentsAdapter.upsertMany(comments, state)
 
@@ -46,6 +50,7 @@ export const commentsReducer = createReducer(
         [postId]: rootComments.map((c) => c.id),
       },
       replies: repliesMap,
+      loadingRootComments: false,
     }
   }),
   on(

@@ -3,6 +3,10 @@ export interface User {
   username: string
   email: string
   provider: string
-  providerId: string
+  providerId: string | null
   imagePath: string
+  bio: string | null
+  followersCount: number
+  followingCount: number
+  followedByMe: boolean
 }

@@ -49,7 +49,7 @@ export class AuthService {
       })
       .pipe(
         tap(() => {
-          this.apollo.client.clearStore()
+          this.apollo.client.resetStore()
         })
       )
   }

@@ -1,0 +1,18 @@
+<div class="container">
+  <div class="content">
+    <img [src]="user.imagePath" />
+    <div>
+      <a [routerLink]="['/', user.username]">{{ user.username }}</a>
+      <p class="bio" *ngIf="user.bio">{{ user.bio.slice(0, 150) + "..." }}</p>
+    </div>
+    <ng-container *ngIf="currentUser$ | async as currentUser">
+      <button
+        *ngIf="currentUser.id !== user.id"
+        [class]="user.followedByMe ? 'following' : ''"
+        (click)="handleFollow()"
+      >
+        {{ user.followedByMe ? "Following" : "Follow" }}
+      </button>
+    </ng-container>
+  </div>
+</div>

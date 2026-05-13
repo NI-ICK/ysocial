@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store'
 import { initialState, postsAdapter, PostsState } from './posts.state'
 import * as PostsActions from './posts.actions'
+import * as UsersActions from '../users/users.actions'
 import { Post } from '../../utils/interfaces/post.interface'
 
 const updatePost = (id: string, changes: Partial<Post>, state: PostsState) => {
@@ -13,9 +14,14 @@ export const postsReducer = createReducer(
     ...state,
     postsLoading: true,
   })),
-  on(PostsActions.loadPostsSuccess, (state, { posts }) =>
-    postsAdapter.setAll(posts, { ...state, loading: false })
-  ),
+  on(PostsActions.loadPostsSuccess, (state, { posts }) => {
+    const updatedState = postsAdapter.addMany(posts, {
+      ...state,
+      postsLoading: false,
+    })
+
+    return { ...updatedState, noMorePosts: posts.length < 5 }
+  }),
   on(PostsActions.loadPostsFailure, (state, { error }) => ({
     ...state,
     postsLoading: false,
@@ -108,5 +114,11 @@ export const postsReducer = createReducer(
       },
       state
     )
-  })
+  }),
+  on(UsersActions.loadCreatedPostsSuccess, (state, { createdPosts }) =>
+    postsAdapter.upsertMany([...createdPosts], state)
+  ),
+  on(UsersActions.loadLikedPostsSuccess, (state, { likedPosts }) =>
+    postsAdapter.upsertMany([...likedPosts], state)
+  )
 )

@@ -23,7 +23,10 @@ import {
 } from '../../../store/posts/posts.selectors'
 import { Post } from '../../../utils/interfaces/post.interface'
 import { CommentsState } from '../../../store/comments/comments.state'
-import { selectCommentsState } from '../../../store/comments/comments.selectors'
+import {
+  selectCommentsState,
+  selectLoadingComments,
+} from '../../../store/comments/comments.selectors'
 import { Comment } from '../../../utils/interfaces/comment.interface'
 
 describe('PostDetailsComponent', () => {
@@ -70,8 +73,8 @@ describe('PostDetailsComponent', () => {
       '2': mockComment2,
     },
     postComments: { '123': ['1', '2'] },
-    loadingRootComments: {},
-    loadingReplies: {},
+    loadingRootComments: false,
+    loadingReplies: false,
     likingComment: {},
     error: null,
   }
@@ -98,12 +101,18 @@ describe('PostDetailsComponent', () => {
     component = fixture.componentInstance
     store = TestBed.inject(MockStore)
     router = TestBed.inject(Router)
-    fixture.detectChanges()
 
     store.overrideSelector(selectCurrentUser, userMock)
     store.overrideSelector(selectCurrentPost, postMock)
     store.overrideSelector(selectIsLiking, { '123': false })
     store.overrideSelector(selectCommentsState, mockCommentsState)
+    store.overrideSelector(selectLoadingComments, false)
+
+    fixture.detectChanges()
+  })
+
+  afterEach(() => {
+    store.resetSelectors()
   })
 
   it('should create', () => {
@@ -120,31 +129,61 @@ describe('PostDetailsComponent', () => {
       expect(navigateSpy).toHaveBeenCalledWith(['/404'])
     })
 
-    it('should assign post, currentUser, isLiking, default form value and dispatch loadCurrentPost', (done) => {
+    it('should assign default form value and dispatch loadCurrentPost', () => {
       const dispatchSpy = jest.spyOn(store, 'dispatch')
 
       component.ngOnInit()
 
       expect(dispatchSpy).toHaveBeenCalledWith(loadCurrentPost({ id: '123' }))
-      forkJoin({
-        user: component.currentUser$.pipe(take(1)),
-        post: component.post$.pipe(take(1)),
-        comments: component.comments$.pipe(take(1)),
-        isLiking: component.isLiking$.pipe(take(1)),
-      }).subscribe(({ user, post, comments, isLiking }) => {
+      expect(component.editForm.get('body')?.value).toEqual('test')
+    })
+
+    it('should select currentUser', (done) => {
+      component.ngOnInit()
+
+      component.currentUser$.pipe(take(1)).subscribe((user) => {
         expect(user?.id).toEqual('234')
         expect(user?.username).toEqual('test')
+        done()
+      })
+    })
 
+    it('should select currentPost', (done) => {
+      component.ngOnInit()
+
+      component.post$.pipe(take(1)).subscribe((post) => {
         expect(post?.id).toEqual('123')
         expect(post?.body).toEqual('test')
+        done()
+      })
+    })
 
+    it('should select comments', (done) => {
+      component.ngOnInit()
+
+      component.comments$.pipe(take(1)).subscribe((comments) => {
         expect(comments[0].body).toEqual('test')
         expect(comments[1].body).toEqual('test2')
+        done()
+      })
+    })
 
+    it('should select isLiking', (done) => {
+      component.ngOnInit()
+
+      component.isLiking$.pipe(take(1)).subscribe((isLiking) => {
         expect(isLiking).toEqual(false)
         done()
       })
-      expect(component.editForm.get('body')?.value).toEqual('test')
+    })
+
+    it('should select loadingComments', (done) => {
+      component.ngOnInit()
+
+      component.loadingComments$.pipe(take(1)).subscribe((loading) => {
+        expect(loading).toEqual(false)
+        done()
+      })
     })
   })
 
