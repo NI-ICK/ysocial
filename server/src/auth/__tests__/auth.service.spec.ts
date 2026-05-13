@@ -52,7 +52,7 @@ describe('AuthService', () => {
       expect(result).toEqual(mockUser)
     })
 
-    it('should thorw UnauthorizedException if user has different provider than local', async () => {
+    it('should throw UnauthorizedException if user has different provider than local', async () => {
       const mockUser = {
         id: '1',
         email: 'test@test.com',
@@ -66,14 +66,14 @@ describe('AuthService', () => {
       ).rejects.toThrow(UnauthorizedException)
     })
 
-    it('should thorw UnauthorizedException if user not found', async () => {
+    it('should throw UnauthorizedException if user not found', async () => {
       ;(usersService.getUserBy as jest.Mock).mockResolvedValue(null)
       await expect(
         authService.validateUser('wrong@gmail.com', 'pass'),
       ).rejects.toThrow(UnauthorizedException)
     })
 
-    it('should thorw UnauthorizedException if password is incorrect', async () => {
+    it('should throw UnauthorizedException if password is incorrect', async () => {
       const mockUser = {
         id: '1',
         email: 'mail@gmail.com',

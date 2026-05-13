@@ -63,8 +63,14 @@ export class PostsService {
     return this.postsRepository.findOne({ where: { id } })
   }
 
-  getAllPosts() {
-    return this.postsRepository.find({ order: { createdAt: 'DESC' } })
+  async getPosts(limit: number, offset: number) {
+    if (offset < 0) throw new BadRequestException('Invalid offset')
+
+    return await this.postsRepository.find({
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    })
   }
 
   async deletePost(id: string) {
@@ -74,5 +80,14 @@ export class PostsService {
     await this.postsRepository.delete(id)
     if (post.imagePublicId)
       await this.cloudinaryService.removeFile(post.imagePublicId)
+  }
+
+  async getPostsCreatedByUser(userId: string, limit: number, offset: number) {
+    return await this.postsRepository.find({
+      where: { user: { id: userId } },
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip: offset,
+    })
   }
 }

@@ -1,4 +1,4 @@
-import { Mutation, Resolver, Query, Args } from '@nestjs/graphql'
+import { Mutation, Resolver, Query, Args, Int } from '@nestjs/graphql'
 import { PostsService } from './posts.service'
 import { Post } from './post.entity'
 import { CreatePostInput } from './dtos/create-post.input'
@@ -71,8 +71,11 @@ export class PostsResolver {
 
   @UseGuards(OptionalJwtAuthGuard)
   @Query((_return) => [Post])
-  getAllPosts() {
-    return this.postsService.getAllPosts()
+  getPosts(
+    @Args('limit', { type: () => Int }) limit: number,
+    @Args('offset', { type: () => Int }) offset: number,
+  ) {
+    return this.postsService.getPosts(limit, offset)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -86,5 +89,29 @@ export class PostsResolver {
   async deletePost(@Args('id') id: string) {
     await this.postsService.deletePost(id)
     return { success: true, message: 'Post deleted' }
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Query(() => [Post])
+  async getPostsCreatedByUser(
+    @Args('userId') userId: string,
+    @Args('limit', { type: () => Int }) limit: number,
+    @Args('offset', { type: () => Int }) offset: number,
+  ) {
+    return await this.postsService.getPostsCreatedByUser(userId, limit, offset)
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Query(() => [Post])
+  async getPostsLikedByUser(
+    @Args('userId') userId: string,
+    @Args('limit', { type: () => Int }) limit: number,
+    @Args('offset', { type: () => Int }) offset: number,
+  ) {
+    return await this.postLikesService.getPostsLikedByUser(
+      userId,
+      limit,
+      offset,
+    )
   }
 }

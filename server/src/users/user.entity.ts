@@ -5,6 +5,7 @@ import { Post } from 'src/posts/post.entity'
 import { AuthProvider } from 'src/utils/auth-provider.enum'
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm'
 import { PostLike } from 'src/post-likes/post-likes.entity'
+import { Follow } from 'src/follows/follow.entity'
 
 registerEnumType(AuthProvider, { name: 'AuthProvider' })
 
@@ -15,7 +16,7 @@ export class User {
   @Field()
   id: string
 
-  @Column()
+  @Column({ unique: true })
   @Field()
   username: string
 
@@ -39,6 +40,10 @@ export class User {
   @Field({ nullable: true })
   imagePath?: string
 
+  @Column({ nullable: true })
+  @Field({ nullable: true })
+  bio?: string
+
   @OneToMany(() => Post, (post) => post.user, { cascade: true })
   @Field(() => [Post], { nullable: true })
   posts?: Post[]
@@ -54,4 +59,12 @@ export class User {
   @OneToMany(() => PostLike, (like) => like.user)
   @Field(() => [PostLike], { nullable: true })
   postLikes: PostLike[]
+
+  @OneToMany(() => Follow, (follow) => follow.follower)
+  @Field(() => [Follow], { nullable: true })
+  followers: Follow[]
+
+  @OneToMany(() => Follow, (follow) => follow.following)
+  @Field(() => [Follow], { nullable: true })
+  following: Follow[]
 }

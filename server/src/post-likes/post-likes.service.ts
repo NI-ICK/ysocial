@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { PostLike } from './post-likes.entity'
 import { In, Repository } from 'typeorm'
@@ -60,5 +64,21 @@ export class PostLikesService {
   async isPostLikedByUser(postId: string, userId: string) {
     const loader = this.createLikedByMeLoader(userId)
     return loader.load(postId)
+  }
+
+  async getPostsLikedByUser(userId: string, limit: number, offset: number) {
+    if (offset < 0) throw new BadRequestException('Invalid offset')
+
+    const likes = await this.postLikesRepository.find({
+      where: { userId },
+      relations: ['post'],
+      order: {
+        likedAt: 'DESC',
+      },
+      take: limit,
+      skip: offset,
+    })
+
+    return likes.map((like) => like.post).filter((post) => !!post)
   }
 }

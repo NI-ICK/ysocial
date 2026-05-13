@@ -144,8 +144,14 @@ describe('PostsService', () => {
     })
   })
 
-  describe('getAllPosts', () => {
-    it('should return all posts', async () => {
+  describe('getPosts', () => {
+    it('should throw BadRequestException if offset is below 0', async () => {
+      await expect(postsService.getPosts(5, -1)).rejects.toThrow(
+        new BadRequestException('Invalid offset'),
+      )
+    })
+
+    it('should return posts', async () => {
       const mockPosts = [
         {
           body: 'test',
@@ -158,7 +164,7 @@ describe('PostsService', () => {
       ]
       ;(postsRepository.find as jest.Mock).mockResolvedValue(mockPosts)
 
-      const result = await postsService.getAllPosts()
+      const result = await postsService.getPosts(5, 0)
 
       expect(result).toEqual(mockPosts)
       expect(postsRepository.find).toHaveBeenCalled()
@@ -207,6 +213,32 @@ describe('PostsService', () => {
       await expect(postsService.deletePost('1')).rejects.toThrow(
         NotFoundException,
       )
+    })
+  })
+
+  describe('getPostsCreatedByUser', () => {
+    it('should return created posts', async () => {
+      const mockPosts = [
+        {
+          body: 'test',
+          id: '1',
+        },
+        {
+          body: 'test2',
+          id: '2',
+        },
+      ]
+      ;(postsRepository.find as jest.Mock).mockResolvedValue(mockPosts)
+
+      const result = await postsService.getPostsCreatedByUser('1', 5, 0)
+
+      expect(result).toEqual(mockPosts)
+      expect(postsRepository.find).toHaveBeenCalledWith({
+        where: { user: { id: '1' } },
+        order: { createdAt: 'DESC' },
+        take: 5,
+        skip: 0,
+      })
     })
   })
 })

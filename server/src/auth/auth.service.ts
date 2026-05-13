@@ -49,6 +49,8 @@ export class AuthService {
       imagePath,
       postLikes: [],
       commentLikes: [],
+      followers: [],
+      following: [],
     })
     return newUser
   }
@@ -84,6 +86,8 @@ export class AuthService {
       imagePath: DEFAULT_IMAGE_PATH,
       postLikes: [],
       commentLikes: [],
+      followers: [],
+      following: [],
     })
     const { password: _, ...result } = newUser
     return result

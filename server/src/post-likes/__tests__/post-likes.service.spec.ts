@@ -4,7 +4,7 @@ import { PostLike } from '../post-likes.entity'
 import { In, Repository } from 'typeorm'
 import { getRepositoryToken } from '@nestjs/typeorm'
 import { Post } from 'src/posts/post.entity'
-import { NotFoundException } from '@nestjs/common'
+import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { User } from 'src/users/user.entity'
 
 describe('PostLikesService', () => {
@@ -12,18 +12,28 @@ describe('PostLikesService', () => {
   let postLikesRepository: Partial<Repository<PostLike>>
   let postsRepository: Partial<Repository<Post>>
 
-  const mockLike = {
+  const mockPost1 = {
+    id: '1',
+    body: 'test',
+  } as Post
+  const mockPost2 = {
+    id: '2',
+    body: 'test',
+  } as Post
+  const mockLike1 = {
     postId: '1',
     userId: '2',
+    post: mockPost1,
+  } as PostLike
+  const mockLike2 = {
+    postId: '2',
+    userId: '2',
+    post: mockPost2,
   } as PostLike
   const mockUser = {
     id: '2',
     username: 'test',
   } as User
-  const mockPost = {
-    id: '3',
-    body: 'test',
-  } as Post
 
   beforeEach(async () => {
     postLikesRepository = {
@@ -74,7 +84,7 @@ describe('PostLikesService', () => {
 
   describe('toggleLike', () => {
     it('should remove like if it already exists', async () => {
-      ;(postLikesRepository.findOne as jest.Mock).mockResolvedValue(mockLike)
+      ;(postLikesRepository.findOne as jest.Mock).mockResolvedValue(mockLike1)
 
       const result = await service.toggleLike('1', mockUser)
 
@@ -96,8 +106,8 @@ describe('PostLikesService', () => {
 
     it('should create like if it does not exist', async () => {
       ;(postLikesRepository.findOne as jest.Mock).mockResolvedValue(null)
-      ;(postsRepository.findOne as jest.Mock).mockResolvedValue(mockPost)
-      ;(postLikesRepository.create as jest.Mock).mockResolvedValue(mockLike)
+      ;(postsRepository.findOne as jest.Mock).mockResolvedValue(mockPost1)
+      ;(postLikesRepository.create as jest.Mock).mockResolvedValue(mockLike1)
 
       const result = await service.toggleLike('1', mockUser)
 
@@ -130,6 +140,34 @@ describe('PostLikesService', () => {
         where: { postId: In(['1']), userId: '2' },
       })
       expect(result).toEqual(false)
+    })
+  })
+
+  describe('getPostsLikedByUser', () => {
+    it('should throw BadRequestException if offset is below 0', async () => {
+      await expect(service.getPostsLikedByUser('1', 5, -1)).rejects.toThrow(
+        new BadRequestException('Invalid offset'),
+      )
+    })
+
+    it('should return liked posts', async () => {
+      ;(postLikesRepository.find as jest.Mock).mockResolvedValue([
+        mockLike1,
+        mockLike2,
+      ])
+
+      const result = await service.getPostsLikedByUser('1', 5, 0)
+
+      expect(result).toEqual([mockPost1, mockPost2])
+      expect(postLikesRepository.find).toHaveBeenCalledWith({
+        where: { userId: '1' },
+        relations: ['post'],
+        order: {
+          likedAt: 'DESC',
+        },
+        take: 5,
+        skip: 0,
+      })
     })
   })
 })

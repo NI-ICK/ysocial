@@ -121,4 +121,24 @@ describe('UsersService', () => {
       })
     })
   })
+
+  describe('generateUniqueUsername', () => {
+    it('should return the same username if it is unique', async () => {
+      ;(usersRepository.findOne as jest.Mock).mockResolvedValue(null)
+
+      const result = await usersService.generateUniqueUsername('test')
+
+      expect(result).toEqual('test')
+    })
+
+    it('should generate username with incremented suffix ', async () => {
+      ;(usersRepository.findOne as jest.Mock)
+        .mockResolvedValueOnce(mockUser)
+        .mockResolvedValueOnce(null)
+
+      const result = await usersService.generateUniqueUsername('test')
+
+      expect(result).toEqual('test1')
+    })
+  })
 })

@@ -25,12 +25,14 @@ describe('PostsResolver', () => {
       createPost: jest.fn(),
       editPost: jest.fn(),
       getPostById: jest.fn(),
-      getAllPosts: jest.fn(),
+      getPosts: jest.fn(),
       deletePost: jest.fn(),
+      getPostsCreatedByUser: jest.fn(),
     }
     postLikesService = {
       getLikesCountByPostId: jest.fn(),
       isPostLikedByUser: jest.fn(),
+      getPostsLikedByUser: jest.fn(),
     }
     commentsService = {
       getCommentsByPostId: jest.fn(),
@@ -90,18 +92,18 @@ describe('PostsResolver', () => {
     })
   })
 
-  describe('getAllPosts', () => {
-    it('should call postsService.getAllPosts and return the result', async () => {
+  describe('getPosts', () => {
+    it('should call postsService.getPosts and return the result', async () => {
       const mockPosts = [
         { body: 'test', id: '1' },
         { body: 'test2', id: '2' },
       ]
 
-      ;(service.getAllPosts as jest.Mock).mockResolvedValue(mockPosts)
+      ;(service.getPosts as jest.Mock).mockResolvedValue(mockPosts)
 
-      const result = await resolver.getAllPosts()
+      const result = await resolver.getPosts(5, 0)
       expect(result).toEqual(mockPosts)
-      expect(service.getAllPosts).toHaveBeenCalled()
+      expect(service.getPosts).toHaveBeenCalled()
     })
   })
 
@@ -115,9 +117,41 @@ describe('PostsResolver', () => {
     })
   })
 
+  describe('getPostsCreatedByUser', () => {
+    it('should call postsService.getPostsCreatedByUser and return the result', async () => {
+      const mockPosts = [
+        { body: 'test', id: '1' },
+        { body: 'test2', id: '2' },
+      ]
+
+      ;(service.getPostsCreatedByUser as jest.Mock).mockResolvedValue(mockPosts)
+
+      const result = await resolver.getPostsCreatedByUser('1', 5, 0)
+      expect(result).toEqual(mockPosts)
+      expect(service.getPostsCreatedByUser).toHaveBeenCalled()
+    })
+  })
+
+  describe('getPostsLikedByUser', () => {
+    it('should call postLikesService.getPostsLikedByUser and return the result', async () => {
+      const mockPosts = [
+        { body: 'test', id: '1' },
+        { body: 'test2', id: '2' },
+      ]
+
+      ;(postLikesService.getPostsLikedByUser as jest.Mock).mockResolvedValue(
+        mockPosts,
+      )
+
+      const result = await resolver.getPostsLikedByUser('1', 5, 0)
+      expect(result).toEqual(mockPosts)
+      expect(postLikesService.getPostsLikedByUser).toHaveBeenCalled()
+    })
+  })
+
   describe('@ResolveField', () => {
     describe('likesCount', () => {
-      it('should call call service and return resonse', () => {
+      it('should call service and return resonse', () => {
         ;(postLikesService.getLikesCountByPostId as jest.Mock).mockReturnValue(
           2,
         )
@@ -135,7 +169,7 @@ describe('PostsResolver', () => {
         expect(result).toEqual(false)
       })
 
-      it('should call call service and return resonse', () => {
+      it('should call service and return resonse', () => {
         ;(postLikesService.isPostLikedByUser as jest.Mock).mockReturnValue(true)
 
         const result = resolver.likedByMe(

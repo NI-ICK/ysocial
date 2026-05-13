@@ -12,9 +12,15 @@ type CommentLike {
 type PostLike {
   userId: String!
   postId: String!
+  likedAt: DateTime!
   user: User!
   post: Post!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Post {
   id: String!
@@ -31,11 +37,6 @@ type Post {
   commentsCount: Float!
 }
 
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type Comment {
   id: String!
   createdAt: DateTime!
@@ -51,6 +52,12 @@ type Comment {
   repliesCount: Float!
 }
 
+type Follow {
+  createdAt: DateTime!
+  follower: User!
+  following: User!
+}
+
 type User {
   id: String!
   username: String!
@@ -59,16 +66,26 @@ type User {
   provider: AuthProvider!
   providerId: String
   imagePath: String
+  bio: String
   posts: [Post!]
   comments: [Comment!]
   commentLikes: [CommentLike!]
   postLikes: [PostLike!]
+  followers: [Follow!]
+  following: [Follow!]
+  followersCount: Float!
+  followingCount: Float!
+  followedByMe: Boolean!
 }
 
 enum AuthProvider {
   LOCAL
   GOOGLE
   GITHUB
+}
+
+type ToggleFollowOutput {
+  followed: Boolean!
 }
 
 type LoginUserResponse {
@@ -101,8 +118,13 @@ type DeleteCommentOutput {
 type Query {
   getCurrentUser: User!
   getAllUsers: [User!]!
+  getUserByUsername(username: String!): User!
+  getFollowersOfUser(username: String!, limit: Int!, offset: Int!): [User!]!
+  getFollowingOfUser(username: String!, limit: Int!, offset: Int!): [User!]!
   getPostById(id: String!): Post!
-  getAllPosts: [Post!]!
+  getPosts(limit: Int!, offset: Int!): [Post!]!
+  getPostsCreatedByUser(userId: String!, limit: Int!, offset: Int!): [Post!]!
+  getPostsLikedByUser(userId: String!, limit: Int!, offset: Int!): [Post!]!
   getCommentsByPostId(id: String!): [Comment!]!
   getRepliesByParentId(id: String!): [Comment!]!
 }
@@ -111,6 +133,7 @@ type Mutation {
   loginUser(loginUserData: LoginUserInput!): LoginUserResponse!
   logoutUser: LogoutUserOutput!
   registerUser(registerUserData: RegisterUserInput!): RegisterUserOutput!
+  toggleFollow(userId: String!): ToggleFollowOutput!
   createPost(createPostData: CreatePostInput!): Post!
   editPost(editPostData: EditPostInput!): Post!
   deletePost(id: String!): DeletePostOutput!
