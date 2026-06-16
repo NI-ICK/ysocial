@@ -10,6 +10,7 @@ import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { selectCurrentUser } from '../../auth/auth.selectors'
 import { User } from '../../../utils/interfaces/user.interface'
 import { Actions } from '@ngrx/effects'
+import { Router, RouterModule } from '@angular/router'
 
 describe('Posts Effects', () => {
   let actions$: Actions
@@ -17,12 +18,14 @@ describe('Posts Effects', () => {
   let store: MockStore
   let popupService: Partial<PopupService>
   let postsService: Partial<PostsService>
+  let router: Router
 
   const postMock = {
     id: '1',
     body: 'test',
     image: null,
     createdAt: new Date().toISOString(),
+    user: { username: 'test' },
   } as Post
 
   beforeEach(() => {
@@ -39,6 +42,7 @@ describe('Posts Effects', () => {
     }
 
     TestBed.configureTestingModule({
+      imports: [RouterModule.forRoot([])],
       providers: [
         PostsEffects,
         provideMockActions(() => actions$),
@@ -49,6 +53,7 @@ describe('Posts Effects', () => {
     })
     effects = TestBed.inject(PostsEffects)
     store = TestBed.inject(MockStore)
+    router = TestBed.inject(Router)
   })
 
   describe('loadPosts', () => {
@@ -189,7 +194,9 @@ describe('Posts Effects', () => {
         })
       )
 
-      actions$ = of(PostsActions.loadCurrentPost({ id: '1' }))
+      actions$ = of(
+        PostsActions.loadCurrentPost({ id: '1', usernameParam: 'test' })
+      )
 
       effects.loadCurrentPost$.subscribe((action) => {
         expect(action).toEqual(
@@ -204,13 +211,72 @@ describe('Posts Effects', () => {
         throwError(() => new Error('test error'))
       )
 
-      actions$ = of(PostsActions.loadCurrentPost({ id: '1' }))
+      actions$ = of(
+        PostsActions.loadCurrentPost({ id: '1', usernameParam: 'test' })
+      )
 
       effects.loadCurrentPost$.subscribe((action) => {
         expect(action).toEqual(
           PostsActions.loadCurrentPostFailure({ error: 'test error' })
         )
         done()
+      })
+    })
+
+    it('should dispatch loadCurrentPostFailure when post is null', (done) => {
+      ;(postsService.getPostById as jest.Mock).mockReturnValue(
+        of({
+          data: {
+            getPostById: null,
+          },
+        })
+      )
+
+      actions$ = of(
+        PostsActions.loadCurrentPost({ id: '1', usernameParam: 'test' })
+      )
+
+      effects.loadCurrentPost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.loadCurrentPostFailure({ error: 'Failed to load post' })
+        )
+        done()
+      })
+    })
+
+    it('should dispatch loadCurrentPostFailure when usernames do not match', (done) => {
+      ;(postsService.getPostById as jest.Mock).mockReturnValue(
+        of({
+          data: {
+            getPostById: postMock,
+          },
+        })
+      )
+
+      actions$ = of(
+        PostsActions.loadCurrentPost({ id: '1', usernameParam: 'test1' })
+      )
+
+      effects.loadCurrentPost$.subscribe((action) => {
+        expect(action).toEqual(
+          PostsActions.loadCurrentPostFailure({
+            error: 'Username does not match',
+          })
+        )
+        done()
+      })
+    })
+
+    describe('loadCurrentPostFailure', () => {
+      it('should navigate to not-found page', (done) => {
+        const navigateSpy = jest.spyOn(router, 'navigate')
+
+        actions$ = of(PostsActions.loadCurrentPostFailure({ error: 'test' }))
+
+        effects.loadCurrentPostFailure$.pipe(take(1)).subscribe(() => {
+          expect(navigateSpy).toHaveBeenCalledWith(['/not-found'])
+          done()
+        })
       })
     })
   })

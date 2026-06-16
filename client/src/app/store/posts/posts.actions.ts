@@ -40,7 +40,7 @@ export const removeOptimisticPost = createAction(
 // ----- Load Current Post -----
 export const loadCurrentPost = createAction(
   '[Posts] Load Current Post',
-  props<{ id: string }>()
+  props<{ id: string; usernameParam: string }>()
 )
 export const loadCurrentPostSuccess = createAction(
   '[Posts] Load Current Post Success',

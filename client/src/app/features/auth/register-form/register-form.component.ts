@@ -53,11 +53,11 @@ export class RegisterFormComponent implements OnInit {
     const repeatPassword = group.get('repeatPassword')?.value
 
     if (password && repeatPassword && password !== repeatPassword) {
-      group.get('password')?.setErrors({ passwordNoMatch: true })
+      group.get('password')?.setErrors({ passwordMismatch: true })
     } else {
       const errors = group.get('password')?.errors
       if (errors) {
-        delete errors['passwordNoMatch']
+        delete errors['passwordMismatch']
         if (!Object.keys(errors).length) group.get('password')?.setErrors(null)
       }
     }

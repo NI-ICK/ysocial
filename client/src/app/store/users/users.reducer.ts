@@ -124,5 +124,50 @@ export const usersReducer = createReducer(
     following: [],
     noMoreFollowing: false,
     followingLoading: false,
-  }))
+  })),
+  on(UsersActions.updateUser, (state, { newUsername, newBio }) => {
+    const userId = state.userProfileId
+    if (!userId) return state
+
+    let updatedState = state
+    if (newUsername) {
+      updatedState = usersAdapter.updateOne(
+        {
+          id: userId,
+          changes: {
+            username: newUsername,
+          },
+        },
+        state
+      )
+    }
+
+    if (newBio) {
+      updatedState = usersAdapter.updateOne(
+        {
+          id: userId,
+          changes: {
+            bio: newBio,
+          },
+        },
+        updatedState
+      )
+    }
+
+    return updatedState
+  }),
+  on(UsersActions.updateUserProfileImage, (state, { preview }) => {
+    const userId = state.userProfileId
+    if (!userId) return state
+
+    const updatedState = usersAdapter.updateOne(
+      {
+        id: userId,
+        changes: { imagePath: preview },
+      },
+      state
+    )
+
+    return updatedState
+  })
 )

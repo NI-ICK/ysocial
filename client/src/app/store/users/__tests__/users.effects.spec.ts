@@ -5,15 +5,18 @@ import { UsersService } from '../../../features/users/users-service/users.servic
 import { provideMockActions } from '@ngrx/effects/testing'
 import { Actions } from '@ngrx/effects'
 import * as UsersActions from '../users.actions'
+import * as AuthActions from '../../auth/auth.actions'
 import { of, take, throwError, toArray } from 'rxjs'
 import { User } from '../../../utils/interfaces/user.interface'
 import { Post } from '../../../utils/interfaces/post.interface'
+import { Router, RouterModule } from '@angular/router'
 
 describe('UsersEffects', () => {
   let effects: UsersEffects
   let usersService: Partial<UsersService>
   let mockStore: MockStore
   let actions$: Actions
+  let router: Router
 
   const userMock = { id: '1', username: 'test' } as User
   const postMock = { id: '2', body: 'test' } as Post
@@ -26,9 +29,13 @@ describe('UsersEffects', () => {
       toggleFollow: jest.fn(),
       getFollowersOfUser: jest.fn(),
       getFollowingOfUser: jest.fn(),
+      updateUser: jest.fn(),
+      deleteUser: jest.fn(),
+      updateUserProfileImage: jest.fn(),
     }
 
     TestBed.configureTestingModule({
+      imports: [RouterModule.forRoot([])],
       providers: [
         UsersEffects,
         provideMockActions(() => actions$),
@@ -38,6 +45,7 @@ describe('UsersEffects', () => {
     })
     effects = TestBed.inject(UsersEffects)
     mockStore = TestBed.inject(MockStore)
+    router = TestBed.inject(Router)
   })
 
   describe('loadUserProfile', () => {
@@ -104,6 +112,19 @@ describe('UsersEffects', () => {
               UsersActions.loadLikedPosts({ userId: '1', offset: 0 })
             ),
             done()
+        })
+      })
+    })
+
+    describe('loadUserProfileFailure', () => {
+      it('should navigate to not-found page', (done) => {
+        const navigateSpy = jest.spyOn(router, 'navigate')
+
+        actions$ = of(UsersActions.loadUserProfileFailure({ error: 'test' }))
+
+        effects.loadUserProfileFailure$.pipe(take(1)).subscribe(() => {
+          expect(navigateSpy).toHaveBeenCalledWith(['/not-found'])
+          done()
         })
       })
     })
@@ -265,6 +286,19 @@ describe('UsersEffects', () => {
         done()
       })
     })
+
+    describe('loadFollowersFailure', () => {
+      it('should navigate to not-found page', (done) => {
+        const navigateSpy = jest.spyOn(router, 'navigate')
+
+        actions$ = of(UsersActions.loadFollowersFailure({ error: 'test' }))
+
+        effects.loadFollowersFailure$.pipe(take(1)).subscribe(() => {
+          expect(navigateSpy).toHaveBeenCalledWith(['/not-found'])
+          done()
+        })
+      })
+    })
   })
 
   describe('loadFollowing', () => {
@@ -295,6 +329,130 @@ describe('UsersEffects', () => {
           UsersActions.loadFollowingFailure({ error: 'test error' })
         )
         done()
+      })
+    })
+
+    describe('loadFollowingFailure', () => {
+      it('should navigate to not-found page', (done) => {
+        const navigateSpy = jest.spyOn(router, 'navigate')
+
+        actions$ = of(UsersActions.loadFollowingFailure({ error: 'test' }))
+
+        effects.loadFollowingFailure$.pipe(take(1)).subscribe(() => {
+          expect(navigateSpy).toHaveBeenCalledWith(['/not-found'])
+          done()
+        })
+      })
+    })
+  })
+
+  describe('updateUser', () => {
+    it('should dispatch updateUserSuccess when usersService.updateUser succeeds', (done) => {
+      ;(usersService.updateUser as jest.Mock).mockReturnValue(
+        of({ data: { updateUser: userMock } })
+      )
+
+      actions$ = of(UsersActions.updateUser({ newUsername: 'new-name' }))
+
+      effects.updateUser$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(UsersActions.updateUserSuccess())
+        done()
+      })
+    })
+
+    it('should dispatch updateUserFailure when usersService.updateUser fails', (done) => {
+      ;(usersService.updateUser as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(UsersActions.updateUser({ newUsername: 'new-name' }))
+
+      effects.updateUser$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(
+          UsersActions.updateUserFailure({ error: 'test error' })
+        )
+        done()
+      })
+    })
+  })
+
+  describe('updateUserProfileImage', () => {
+    it('should dispatch updateUserProfileImageSuccess when usersService.updateUserProfileImage succeeds', (done) => {
+      ;(usersService.updateUserProfileImage as jest.Mock).mockReturnValue(
+        of({ data: { updateUserProfileImage: userMock } })
+      )
+
+      actions$ = of(
+        UsersActions.updateUserProfileImage({
+          image: new File([], ''),
+          preview: 'preview-data',
+        })
+      )
+
+      effects.updateUserProfileImage$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(UsersActions.updateUserProfileImageSuccess())
+        done()
+      })
+    })
+
+    it('should dispatch updateUserProfileImageSuccess when usersService.updateUserProfileImage fails', (done) => {
+      ;(usersService.updateUserProfileImage as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(
+        UsersActions.updateUserProfileImage({
+          image: new File([], ''),
+          preview: 'preview-data',
+        })
+      )
+
+      effects.updateUserProfileImage$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(
+          UsersActions.updateUserProfileImageFailure({ error: 'test error' })
+        )
+        done()
+      })
+    })
+  })
+
+  describe('deleteUser', () => {
+    it('should dispatch deleteUserSuccess when usersService.deleteUser succeeds', (done) => {
+      ;(usersService.deleteUser as jest.Mock).mockReturnValue(
+        of({ data: { deleteUser: { success: true, message: 'test' } } })
+      )
+
+      actions$ = of(UsersActions.deleteUser())
+
+      effects.deleteUser$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(UsersActions.deleteUserSuccess())
+        done()
+      })
+    })
+
+    it('should dispatch deleteUserSuccess when usersService.deleteUser fails', (done) => {
+      ;(usersService.deleteUser as jest.Mock).mockReturnValue(
+        throwError(() => new Error('test error'))
+      )
+
+      actions$ = of(UsersActions.deleteUser())
+
+      effects.deleteUser$.pipe(take(1)).subscribe((action) => {
+        expect(action).toEqual(
+          UsersActions.deleteUserFailure({ error: 'test error' })
+        )
+        done()
+      })
+    })
+
+    describe('deleteUserSuccess', () => {
+      it('should dispatch logoutUser', (done) => {
+        actions$ = of(UsersActions.deleteUserSuccess())
+
+        effects.deleteUserSuccess$.pipe(take(1)).subscribe((action) => {
+          expect(action).toEqual(AuthActions.logoutUser())
+          done()
+        })
       })
     })
   })

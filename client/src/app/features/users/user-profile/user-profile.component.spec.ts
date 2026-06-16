@@ -15,6 +15,7 @@ import {
   clearUserProfile,
   loadUserProfile,
   toggleFollow,
+  updateUserProfileImage,
 } from '../../../store/users/users.actions'
 
 describe('UserProfileComponent', () => {
@@ -48,6 +49,8 @@ describe('UserProfileComponent', () => {
     mockStore.overrideSelector(selectCurrentUser, userMock)
 
     fixture.detectChanges()
+
+    window.URL.createObjectURL = jest.fn().mockReturnValue('preview-data')
   })
 
   it('should create', () => {
@@ -148,6 +151,38 @@ describe('UserProfileComponent', () => {
       component.handleFollow()
 
       expect(dispatchSpy).toHaveBeenCalledWith(toggleFollow({ userId: '1' }))
+    })
+  })
+
+  describe('handleFile', () => {
+    it('should handle file input click on handleChooseFile', () => {
+      const fileInput = document.createElement('input')
+      fileInput.type = 'file'
+      component.fileInput = { nativeElement: fileInput }
+      const clickSpy = jest.spyOn(fileInput, 'click')
+
+      component.handleChooseFile()
+
+      expect(clickSpy).toHaveBeenCalled()
+    })
+
+    it('should update selectedFile and imagePreview on handleFileInputChange and dispatch action', () => {
+      const dispatchSpy = jest.spyOn(mockStore, 'dispatch')
+      const file = new File(['content'], 'file')
+
+      const input = document.createElement('input')
+      Object.defineProperty(input, 'files', { value: [file], writable: false })
+
+      const event = new Event('change')
+      Object.defineProperty(event, 'target', { value: input, writable: false })
+
+      component.handleFileInputChange(event)
+
+      expect(component.selectedFile).toEqual(file)
+      expect(component.imagePreview).toBe('preview-data')
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        updateUserProfileImage({ image: file, preview: 'preview-data' })
+      )
     })
   })
 

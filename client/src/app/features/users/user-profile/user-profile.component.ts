@@ -1,35 +1,44 @@
 import {
   Component,
+  ElementRef,
   Inject,
   OnDestroy,
   OnInit,
   PLATFORM_ID,
+  ViewChild,
 } from '@angular/core'
 import { ActivatedRoute, RouterLink } from '@angular/router'
-import { combineLatest, Observable, take } from 'rxjs'
+import { Observable, take } from 'rxjs'
 import { Store } from '@ngrx/store'
 import { selectUserProfile } from '../../../store/users/users.selectors'
 import {
   clearUserProfile,
   loadUserProfile,
   toggleFollow,
+  updateUserProfileImage,
 } from '../../../store/users/users.actions'
 import { CommonModule, isPlatformBrowser, NgIf } from '@angular/common'
 import { User } from '../../../utils/interfaces/user.interface'
 import { selectCurrentUser } from '../../../store/auth/auth.selectors'
 import { CreatedPostsComponent } from '../created-posts/created-posts.component'
 import { LikedPostsComponent } from '../liked-posts/liked-posts.component'
+import { ModalWrapperComponent } from '../../../shared/modal-wrapper/modal-wrapper.component'
+import { EditUserFormComponent } from '../edit-user-form/edit-user-form.component'
+import { PenIconComponent } from '../../../shared/icons/pen-icon/pen-icon.component'
 
 type PostsState = 'created' | 'liked'
 
 @Component({
-  selector: 'app-user-profile',
+  selector: 'user-profile',
   imports: [
     NgIf,
     CommonModule,
     RouterLink,
     CreatedPostsComponent,
     LikedPostsComponent,
+    ModalWrapperComponent,
+    EditUserFormComponent,
+    PenIconComponent,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss',
@@ -39,6 +48,11 @@ export class UserProfileComponent implements OnInit, OnDestroy {
   currentUser$ = new Observable<User | null>()
   postsState!: PostsState
   isBrowser = false
+  showEditModal = false
+  profileImgHovered = false
+  selectedFile: File | null = null
+  imagePreview = ''
+  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>
 
   constructor(
     private activatedRoute: ActivatedRoute,
@@ -80,6 +94,35 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       )
     })
   }
+
+  handleChooseFile() {
+    this.fileInput.nativeElement.click()
+  }
+
+  handleFileInputChange(e: Event) {
+    const input = e.target as HTMLInputElement
+
+    if (!input.files?.length) return
+
+    this.selectedFile = input.files[0]
+
+    const preview = URL.createObjectURL(this.selectedFile)
+
+    this.imagePreview = preview
+
+    this.store.dispatch(
+      updateUserProfileImage({
+        image: this.selectedFile,
+        preview,
+      })
+    )
+  }
+
+  openEditModal = () => (this.showEditModal = true)
+  closeEditModal = () => (this.showEditModal = false)
+
+  profileImgMouseEnter = () => (this.profileImgHovered = true)
+  profileImgMouseLeave = () => (this.profileImgHovered = false)
 
   ngOnDestroy() {
     this.store.dispatch(clearUserProfile())

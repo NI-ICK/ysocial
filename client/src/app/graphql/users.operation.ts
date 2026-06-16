@@ -52,3 +52,65 @@ export const GET_FOLLOWING_OF_USER = gql`
     }
   }
 `
+
+export const DELETE_USER = gql`
+  mutation {
+    deleteUser {
+      success
+      message
+    }
+  }
+`
+
+export const UPDATE_USER = gql`
+  mutation updateUser(
+    $newUsername: String
+    $newBio: String
+    $newPassword: String
+    $newEmail: String
+  ) {
+    updateUser(
+      data: {
+        newUsername: $newUsername
+        newBio: $newBio
+        newPassword: $newPassword
+        newEmail: $newEmail
+      }
+    ) {
+      id
+      username
+      email
+      imagePath
+      bio
+      followersCount
+      followingCount
+      followedByMe
+    }
+  }
+`
+
+export const IS_USERNAME_TAKEN = gql`
+  query isUsernameTaken($username: String!) {
+    isUsernameTaken(username: $username)
+  }
+`
+export const IS_EMAIL_TAKEN = gql`
+  query isEmailTaken($email: String!) {
+    isEmailTaken(email: $email)
+  }
+`
+
+export const UPDATE_USER_PROFILE_IMAGE = gql`
+  mutation updateUserProfileImage($image: Upload!) {
+    updateUserProfileImage(data: { image: $image }) {
+      id
+      username
+      email
+      imagePath
+      bio
+      followersCount
+      followingCount
+      followedByMe
+    }
+  }
+`

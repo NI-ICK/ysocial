@@ -105,9 +105,10 @@ export class PostDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     const postId = this.activatedRoute.snapshot.paramMap.get('postId')
+    const username = this.activatedRoute.snapshot.paramMap.get('username')
 
-    if (!postId) {
-      this.router.navigate(['/404'])
+    if (!postId || !username) {
+      this.router.navigate(['/not-found'])
       return
     }
 
@@ -125,7 +126,9 @@ export class PostDetailsComponent implements OnInit, OnDestroy {
     )
     this.isLiking$.pipe(take(1)).subscribe()
 
-    this.store.dispatch(loadCurrentPost({ id: postId }))
+    this.store.dispatch(
+      loadCurrentPost({ id: postId, usernameParam: username })
+    )
   }
 
   formatDate(isoDate: string) {

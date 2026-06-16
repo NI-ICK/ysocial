@@ -14,12 +14,14 @@ import {
   switchMap,
   take,
   tap,
+  throwError,
 } from 'rxjs'
 import { PostsService } from '../../features/posts/posts-service/posts.service'
 import { Store } from '@ngrx/store'
 import { selectCurrentUser } from '../auth/auth.selectors'
 import { v4 as uuid } from 'uuid'
 import { Post } from '../../utils/interfaces/post.interface'
+import { Router } from '@angular/router'
 
 @Injectable()
 export class PostsEffects {
@@ -27,7 +29,8 @@ export class PostsEffects {
     private actions$: Actions,
     private postsService: PostsService,
     private popupService: PopupService,
-    private store: Store
+    private store: Store,
+    private router: Router
   ) {}
 
   loadPosts$ = createEffect(() =>
@@ -111,15 +114,20 @@ export class PostsEffects {
   loadCurrentPost$ = createEffect(() =>
     this.actions$.pipe(
       ofType(PostsActions.loadCurrentPost),
-      switchMap(({ id }) =>
+      switchMap(({ id, usernameParam }) =>
         this.postsService.getPostById(id).pipe(
-          map((result) => {
+          switchMap((result) => {
             const post = result.data?.getPostById
-            if (!post) throw new Error('Failed to load post')
+            if (!post) return throwError(() => new Error('Failed to load post'))
 
-            return PostsActions.loadCurrentPostSuccess({
-              post,
-            })
+            if (usernameParam !== post.user.username)
+              return throwError(() => new Error('Username does not match'))
+
+            return of(
+              PostsActions.loadCurrentPostSuccess({
+                post,
+              })
+            )
           }),
           catchError((err) =>
             of(PostsActions.loadCurrentPostFailure({ error: err.message }))
@@ -127,6 +135,15 @@ export class PostsEffects {
         )
       )
     )
+  )
+
+  loadCurrentPostFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(PostsActions.loadCurrentPostFailure),
+        tap(() => this.router.navigate(['/not-found']))
+      ),
+    { dispatch: false }
   )
 
   deletePost$ = createEffect(() =>

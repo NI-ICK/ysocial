@@ -2,7 +2,28 @@
   <div class="content" *ngIf="userProfile$ | async as userProfile">
     <div class="profile">
       <div class="wrapper">
-        <img [src]="userProfile.imagePath" />
+        <div
+          class="image"
+          (mouseover)="profileImgMouseEnter()"
+          (mouseleave)="profileImgMouseLeave()"
+        >
+          <img [src]="userProfile.imagePath" />
+          <ng-container *ngIf="currentUser$ | async as currentUser">
+            <div
+              class="icon {{ profileImgHovered ? 'hovered' : '' }}"
+              (click)="handleChooseFile()"
+            >
+              <pen-icon></pen-icon>
+            </div>
+
+            <input
+              #fileInput
+              type="file"
+              style="display: none"
+              (change)="handleFileInputChange($event)"
+            />
+          </ng-container>
+        </div>
         <div class="details">
           <p>{{ userProfile.username }}</p>
           <div class="follows">
@@ -23,9 +44,19 @@
           >
             {{ userProfile.followedByMe ? "Following" : "Follow" }}
           </button>
+          <button
+            *ngIf="currentUser.id === userProfile.id"
+            (click)="openEditModal()"
+          >
+            Edit user
+          </button>
         </ng-container>
       </div>
-      <p class="bio">{{ userProfile.bio }}</p>
+      <div class="bio">
+        <p>
+          {{ userProfile.bio }}
+        </p>
+      </div>
     </div>
     <div class="buttons">
       <button
@@ -53,3 +84,6 @@
     ></liked-posts>
   </div>
 </div>
+<modal-wrapper *ngIf="showEditModal" (close)="closeEditModal()">
+  <edit-user-form (submitSuccess)="closeEditModal()"></edit-user-form>
+</modal-wrapper>

@@ -1,12 +1,18 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import * as UsersActions from './users.actions'
-import { catchError, concatMap, map, mergeMap, of, switchMap } from 'rxjs'
+import * as AuthActions from '../auth/auth.actions'
+import { catchError, concatMap, map, mergeMap, of, switchMap, tap } from 'rxjs'
 import { UsersService } from '../../features/users/users-service/users.service'
+import { Router } from '@angular/router'
 
 @Injectable()
 export class UsersEffects {
-  constructor(private actions$: Actions, private usersService: UsersService) {}
+  constructor(
+    private actions$: Actions,
+    private usersService: UsersService,
+    private router: Router
+  ) {}
 
   loadUserProfile$ = createEffect(() =>
     this.actions$.pipe(
@@ -39,6 +45,15 @@ export class UsersEffects {
         UsersActions.loadLikedPosts({ userId: userProfile.id, offset: 0 }),
       ])
     )
+  )
+
+  loadUserProfileFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UsersActions.loadUserProfileFailure),
+        tap(() => this.router.navigate(['/not-found']))
+      ),
+    { dispatch: false }
   )
 
   loadCreatedPosts$ = createEffect(() =>
@@ -118,6 +133,15 @@ export class UsersEffects {
     )
   )
 
+  loadFollowersFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UsersActions.loadFollowersFailure),
+        tap(() => this.router.navigate(['/not-found']))
+      ),
+    { dispatch: false }
+  )
+
   loadFollowing$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UsersActions.loadFollowing),
@@ -133,6 +157,66 @@ export class UsersEffects {
           )
         )
       )
+    )
+  )
+
+  loadFollowingFailure$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(UsersActions.loadFollowingFailure),
+        tap(() => this.router.navigate(['/not-found']))
+      ),
+    { dispatch: false }
+  )
+
+  updateUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.updateUser),
+      switchMap((data) =>
+        this.usersService.updateUser(data).pipe(
+          map(() => UsersActions.updateUserSuccess()),
+          catchError((err) =>
+            of(UsersActions.updateUserFailure({ error: err.message }))
+          )
+        )
+      )
+    )
+  )
+
+  updateUserProfileImage$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.updateUserProfileImage),
+      switchMap(({ image }) =>
+        this.usersService.updateUserProfileImage(image).pipe(
+          map(() => UsersActions.updateUserProfileImageSuccess()),
+          catchError((err) =>
+            of(
+              UsersActions.updateUserProfileImageFailure({ error: err.message })
+            )
+          )
+        )
+      )
+    )
+  )
+
+  deleteUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.deleteUser),
+      switchMap(() =>
+        this.usersService.deleteUser().pipe(
+          map(() => UsersActions.deleteUserSuccess()),
+          catchError((err) =>
+            of(UsersActions.deleteUserFailure({ error: err.message }))
+          )
+        )
+      )
+    )
+  )
+
+  deleteUserSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.deleteUserSuccess),
+      map(() => AuthActions.logoutUser())
     )
   )
 }

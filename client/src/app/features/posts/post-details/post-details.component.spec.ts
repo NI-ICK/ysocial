@@ -82,7 +82,7 @@ describe('PostDetailsComponent', () => {
   beforeEach(async () => {
     activatedRouteMock = {
       snapshot: {
-        paramMap: convertToParamMap({ postId: '123' }),
+        paramMap: convertToParamMap({ postId: '123', username: 'test' }),
       },
     }
 
@@ -120,13 +120,13 @@ describe('PostDetailsComponent', () => {
   })
 
   describe('ngOnInit', () => {
-    it('should navigate to 404 page if postId is null', () => {
+    it('should navigate to not-found page if postId is null', () => {
       activatedRouteMock.snapshot.paramMap = convertToParamMap({ postId: null })
       const navigateSpy = jest.spyOn(router, 'navigate')
 
       component.ngOnInit()
 
-      expect(navigateSpy).toHaveBeenCalledWith(['/404'])
+      expect(navigateSpy).toHaveBeenCalledWith(['/not-found'])
     })
 
     it('should assign default form value and dispatch loadCurrentPost', () => {
@@ -134,7 +134,9 @@ describe('PostDetailsComponent', () => {
 
       component.ngOnInit()
 
-      expect(dispatchSpy).toHaveBeenCalledWith(loadCurrentPost({ id: '123' }))
+      expect(dispatchSpy).toHaveBeenCalledWith(
+        loadCurrentPost({ id: '123', usernameParam: 'test' })
+      )
       expect(component.editForm.get('body')?.value).toEqual('test')
     })
 

@@ -90,3 +90,40 @@ export const loadFollowingFailure = createAction(
   props<{ error: string }>()
 )
 export const clearFollowing = createAction('[Users] Clear Following')
+
+// ----- Update User -----
+export const updateUser = createAction(
+  '[Users] Update User',
+  props<{
+    newUsername?: string | null
+    newBio?: string | null
+    newPassword?: string | null
+    newEmail?: string | null
+  }>()
+)
+export const updateUserSuccess = createAction('[Users] Update User Success')
+export const updateUserFailure = createAction(
+  '[Users] Update User Failure',
+  props<{ error: string }>()
+)
+
+// ----- Update User Profile Image -----
+export const updateUserProfileImage = createAction(
+  '[Users] Update User Profile Image',
+  props<{ image: File; preview: string }>()
+)
+export const updateUserProfileImageSuccess = createAction(
+  '[Users] Update User Profile Image Success'
+)
+export const updateUserProfileImageFailure = createAction(
+  '[Users] Update User Profile Image Failure',
+  props<{ error: string }>()
+)
+
+// ----- Delete User -----
+export const deleteUser = createAction('[Users] Delete User')
+export const deleteUserSuccess = createAction('[Users] Delete User Success')
+export const deleteUserFailure = createAction(
+  '[Users] Delete User Failure',
+  props<{ error: string }>()
+)

@@ -8,6 +8,7 @@ describe('UsersReducer', () => {
   const userMock1 = {
     id: '1',
     username: 'test',
+    bio: 'test',
     followedByMe: false,
     followersCount: 0,
   } as User
@@ -387,6 +388,91 @@ describe('UsersReducer', () => {
       const state = usersReducer(init, UsersActions.clearFollowing())
 
       expect(state).toEqual(initialState)
+    })
+  })
+
+  describe('updateUser', () => {
+    it('should return state is userProfileId is null', () => {
+      const state = usersReducer(
+        initialState,
+        UsersActions.updateUser({ newUsername: 'test' })
+      )
+
+      expect(state).toEqual(initialState)
+    })
+
+    it('should update username if provided', () => {
+      const init = usersAdapter.addOne(userMock1, {
+        ...initialState,
+        userProfileId: '1',
+      })
+
+      const state = usersReducer(
+        init,
+        UsersActions.updateUser({ newUsername: 'new-name' })
+      )
+
+      const expectedState = usersAdapter.addOne(
+        { ...userMock1, username: 'new-name' },
+        { ...initialState, userProfileId: '1' }
+      )
+
+      expect(state).toEqual(expectedState)
+    })
+
+    it('should update bio if provided', () => {
+      const init = usersAdapter.addOne(userMock1, {
+        ...initialState,
+        userProfileId: '1',
+      })
+
+      const state = usersReducer(
+        init,
+        UsersActions.updateUser({ newBio: 'new-bio' })
+      )
+
+      const expectedState = usersAdapter.addOne(
+        { ...userMock1, bio: 'new-bio' },
+        { ...initialState, userProfileId: '1' }
+      )
+
+      expect(state).toEqual(expectedState)
+    })
+  })
+
+  describe('updateUserProfileImage', () => {
+    it('should return state is userProfileId is null', () => {
+      const state = usersReducer(
+        initialState,
+        UsersActions.updateUserProfileImage({
+          image: new File([], ''),
+          preview: 'test',
+        })
+      )
+
+      expect(state).toEqual(initialState)
+    })
+
+    it('should update imagePath with preview', () => {
+      const file = new File([''], 'file')
+
+      const init = usersAdapter.addOne(userMock1, {
+        ...initialState,
+        userProfileId: '1',
+      })
+      const state = usersReducer(
+        init,
+        UsersActions.updateUserProfileImage({
+          image: file,
+          preview: 'preview-data',
+        })
+      )
+      const expectedState = usersAdapter.addOne(
+        { ...userMock1, imagePath: 'preview-data' },
+        { ...initialState, userProfileId: '1' }
+      )
+
+      expect(state).toEqual(expectedState)
     })
   })
 })

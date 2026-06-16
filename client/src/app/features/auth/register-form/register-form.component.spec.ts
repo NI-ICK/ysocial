@@ -101,7 +101,7 @@ describe('RegisterFormComponent', () => {
     it('should set error if passwords do not match', () => {
       const form = createForm('test1', 'test2')
 
-      expect(form.get('password')?.getError('passwordNoMatch')).toBe(true)
+      expect(form.get('password')?.getError('passwordMismatch')).toBe(true)
     })
   })
 })

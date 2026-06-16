@@ -1,5 +1,6 @@
 <div>
   <p *ngIf="hasError('required')">This field is required.</p>
   <p *ngIf="hasError('email')">Please enter valid email.</p>
-  <p *ngIf="hasError('passwordNoMatch')">Passwords do not match.</p>
+  <p *ngIf="hasError('passwordMismatch')">Passwords do not match.</p>
+  <p *ngIf="hasError('emailMismatch')">E-mails do not match.</p>
 </div>

@@ -1,0 +1,77 @@
+<form [formGroup]="editForm" (ngSubmit)="handleSubmit()">
+  <h2>Profile Information</h2>
+  <div class="field username">
+    <label for="username">USERNAME</label>
+    <input
+      type="text"
+      id="username"
+      formControlName="username"
+      placeholder="Username"
+    />
+  </div>
+  <div class="field bio">
+    <label for="bio">BIO</label>
+    <textarea
+      id="bio"
+      formControlName="bio"
+      placeholder="Bio"
+      #textarea
+    ></textarea>
+  </div>
+  <h2>Account & Security</h2>
+  <h4>Change Password</h4>
+  <password-field
+    [formControl]="passwordControl"
+    label="PASSWORD"
+    placeholder="Password"
+  ></password-field>
+  <password-field
+    [formControl]="repeatPasswordControl"
+    label="REPEAT PASSWORD"
+    placeholder="Repeat Password"
+  ></password-field>
+  <div class="errors">
+    <print-error [control]="editForm.get('password')"></print-error>
+  </div>
+  <h4>Change E-mail</h4>
+  <div class="field">
+    <label for="email">E-MAIL</label>
+    <input
+      type="text"
+      id="email"
+      formControlName="email"
+      placeholder="E-mail"
+    />
+  </div>
+  <div class="field">
+    <label for="repeat-email">REPEAT E-MAIL</label>
+    <input
+      type="text"
+      id="repeat-email"
+      formControlName="repeatEmail"
+      placeholder="Repeat E-mail"
+    />
+  </div>
+  <div class="errors">
+    <print-error [control]="editForm.get('email')"></print-error>
+    <p *ngIf="editForm.errors?.['atLeastOneRequired']">
+      Please fill out at least on field.
+    </p>
+  </div>
+  <div class="buttons">
+    <button type="button" class="delete" (click)="openConfirmDelete()">
+      Delete Account
+    </button>
+    <button type="submit">Save</button>
+  </div>
+</form>
+
+<modal-wrapper (close)="closeConfirmDelete()" *ngIf="showConfirmDelete">
+  <div class="delete-modal">
+    <p>Are you sure you want to delete your account?</p>
+    <div>
+      <button class="close" (click)="closeConfirmDelete()">Close</button>
+      <button class="delete" (click)="handleDeleteUser()">Delete</button>
+    </div>
+  </div>
+</modal-wrapper>

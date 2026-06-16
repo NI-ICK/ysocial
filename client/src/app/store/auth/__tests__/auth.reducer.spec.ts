@@ -1,6 +1,7 @@
 import { authReducer } from '../auth.reducer'
 import { initialState } from '../auth.state'
 import * as AuthActions from '../auth.actions'
+import * as UsersActions from '../../users/users.actions'
 import { AuthStatus } from '../../../utils/auth-status.enum'
 import { User } from '../../../utils/interfaces/user.interface'
 
@@ -8,6 +9,7 @@ describe('Auth Reducer', () => {
   const mockUser = {
     id: '1',
     username: 'test',
+    imagePath: 'test',
   } as User
 
   it('should return the initial state', () => {
@@ -66,6 +68,34 @@ describe('Auth Reducer', () => {
       const state = authReducer(initialState, AuthActions.registerUserSuccess())
 
       expect(state.registerSuccess).toEqual(true)
+    })
+  })
+
+  describe('updateUserProfileImage', () => {
+    it('should return state if user is null', () => {
+      const file = new File(['content'], 'file')
+      const state = authReducer(
+        initialState,
+        UsersActions.updateUserProfileImage({
+          image: file,
+          preview: 'preview-data',
+        })
+      )
+
+      expect(state).toEqual(initialState)
+    })
+
+    it('should update imagePath if user exists', () => {
+      const file = new File(['content'], 'file')
+      const state = authReducer(
+        { ...initialState, user: mockUser },
+        UsersActions.updateUserProfileImage({
+          image: file,
+          preview: 'preview-data',
+        })
+      )
+
+      expect(state.user?.imagePath).toEqual('preview-data')
     })
   })
 })
