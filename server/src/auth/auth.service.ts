@@ -80,7 +80,7 @@ export class AuthService {
     const newUser = await this.usersService.createUser({
       id: randomUUID(),
       username,
-      email,
+      email: email.toLowerCase(),
       password: hashedPassword,
       provider: AuthProvider.LOCAL,
       imagePath: DEFAULT_IMAGE_PATH,

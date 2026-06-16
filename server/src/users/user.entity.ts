@@ -42,6 +42,10 @@ export class User {
 
   @Column({ nullable: true })
   @Field({ nullable: true })
+  imagePublicId?: string
+
+  @Column({ nullable: true })
+  @Field({ nullable: true })
   bio?: string
 
   @OneToMany(() => Post, (post) => post.user, { cascade: true })

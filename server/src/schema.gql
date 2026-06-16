@@ -66,6 +66,7 @@ type User {
   provider: AuthProvider!
   providerId: String
   imagePath: String
+  imagePublicId: String
   bio: String
   posts: [Post!]
   comments: [Comment!]
@@ -82,6 +83,11 @@ enum AuthProvider {
   LOCAL
   GOOGLE
   GITHUB
+}
+
+type DeleteUserOutput {
+  success: Boolean!
+  message: String!
 }
 
 type ToggleFollowOutput {
@@ -119,6 +125,8 @@ type Query {
   getCurrentUser: User!
   getAllUsers: [User!]!
   getUserByUsername(username: String!): User!
+  isUsernameTaken(username: String!): Boolean!
+  isEmailTaken(email: String!): Boolean!
   getFollowersOfUser(username: String!, limit: Int!, offset: Int!): [User!]!
   getFollowingOfUser(username: String!, limit: Int!, offset: Int!): [User!]!
   getPostById(id: String!): Post!
@@ -133,6 +141,9 @@ type Mutation {
   loginUser(loginUserData: LoginUserInput!): LoginUserResponse!
   logoutUser: LogoutUserOutput!
   registerUser(registerUserData: RegisterUserInput!): RegisterUserOutput!
+  updateUser(data: UpdateUserInput!): User!
+  deleteUser: DeleteUserOutput!
+  updateUserProfileImage(data: UpdateUserProfileImageInput!): User!
   toggleFollow(userId: String!): ToggleFollowOutput!
   createPost(createPostData: CreatePostInput!): Post!
   editPost(editPostData: EditPostInput!): Post!
@@ -154,13 +165,24 @@ input RegisterUserInput {
   password: String!
 }
 
-input CreatePostInput {
-  body: String
-  image: Upload
+input UpdateUserInput {
+  newPassword: String
+  newEmail: String
+  newUsername: String
+  newBio: String
+}
+
+input UpdateUserProfileImageInput {
+  image: Upload!
 }
 
 """The `Upload` scalar type represents a file upload."""
 scalar Upload
+
+input CreatePostInput {
+  body: String
+  image: Upload
+}
 
 input EditPostInput {
   id: String!

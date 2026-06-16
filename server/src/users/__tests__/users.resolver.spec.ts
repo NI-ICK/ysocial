@@ -2,8 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { UsersResolver } from '../users.resolver'
 import { UsersService } from '../users.service'
 import { FollowsService } from 'src/follows/follows.service'
-import { NotFoundException } from '@nestjs/common'
+import { NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { User } from '../user.entity'
+import { UpdateUserProfileImageInput } from '../dtos/update-user-profile-image.input'
+import { FileUpload } from 'graphql-upload-ts'
 
 describe('UsersResolver', () => {
   let usersResolver: UsersResolver
@@ -28,6 +30,11 @@ describe('UsersResolver', () => {
     usersService = {
       getUserBy: jest.fn(),
       getAllUsers: jest.fn(),
+      updateUser: jest.fn(),
+      isUsernameTaken: jest.fn(),
+      isEmailTaken: jest.fn(),
+      deleteUser: jest.fn(),
+      updateUserProfileImage: jest.fn(),
     }
 
     followsService = {
@@ -76,6 +83,91 @@ describe('UsersResolver', () => {
 
       expect(usersService.getUserBy).toHaveBeenCalledWith({ username: 'test' })
       expect(result).toEqual(mockUsers[0])
+    })
+  })
+
+  describe('isUsernameTaken', () => {
+    it('should call usersService', async () => {
+      await usersResolver.isUsernameTaken('test')
+
+      expect(usersService.isUsernameTaken).toHaveBeenCalledWith('test')
+    })
+  })
+
+  describe('isEmailTaken', () => {
+    it('should call usersService', async () => {
+      await usersResolver.isEmailTaken('test@test.com')
+
+      expect(usersService.isEmailTaken).toHaveBeenCalledWith('test@test.com')
+    })
+  })
+
+  describe('updateUser', () => {
+    it('should throw UnauthorizedException if user is null', async () => {
+      await expect(
+        usersResolver.updateUser({ newUsername: 'test' }, null),
+      ).rejects.toThrow(new UnauthorizedException('You are not logged in'))
+    })
+
+    it('should call usersService and return user', async () => {
+      ;(usersService.updateUser as jest.Mock).mockResolvedValue(mockUsers[0])
+
+      const result = await usersResolver.updateUser(
+        { newUsername: 'test' },
+        mockUsers[0],
+      )
+
+      expect(result).toEqual(mockUsers[0])
+      expect(usersService.updateUser).toHaveBeenCalled()
+    })
+  })
+
+  describe('deleteUser', () => {
+    it('should throw UnauthorizedException if user is null', async () => {
+      await expect(usersResolver.deleteUser(null)).rejects.toThrow(
+        new UnauthorizedException('You are not logged in'),
+      )
+    })
+
+    it('should call usersService and return response', async () => {
+      const result = await usersResolver.deleteUser(mockUsers[0])
+
+      expect(result).toEqual({ success: true, message: 'User deleted' })
+      expect(usersService.deleteUser).toHaveBeenCalled()
+    })
+  })
+
+  describe('updateUserProfileImage', () => {
+    it('should throw UnauthorizedException if user is null', async () => {
+      const input = {
+        image: Promise.resolve({
+          createReadStream: jest.fn(),
+        } as Partial<FileUpload>),
+      } as UpdateUserProfileImageInput
+
+      await expect(
+        usersResolver.updateUserProfileImage(input, null),
+      ).rejects.toThrow(new UnauthorizedException('You are not logged in'))
+    })
+
+    it('should call usersService and return user', async () => {
+      ;(usersService.updateUserProfileImage as jest.Mock).mockResolvedValue(
+        mockUsers[0],
+      )
+
+      const input = {
+        image: Promise.resolve({
+          createReadStream: jest.fn(),
+        } as Partial<FileUpload>),
+      } as UpdateUserProfileImageInput
+
+      const result = await usersResolver.updateUserProfileImage(
+        input,
+        mockUsers[0],
+      )
+
+      expect(result).toEqual(mockUsers[0])
+      expect(usersService.updateUserProfileImage).toHaveBeenCalled()
     })
   })
 

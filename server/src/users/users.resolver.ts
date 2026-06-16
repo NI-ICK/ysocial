@@ -1,10 +1,24 @@
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql'
 import { User } from './user.entity'
 import { UsersService } from './users.service'
 import { FollowsService } from 'src/follows/follows.service'
-import { NotFoundException, UseGuards } from '@nestjs/common'
+import {
+  NotFoundException,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common'
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt-auth.guard'
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator'
+import { DeleteUserOutput } from './dtos/delete-user.output'
+import { UpdateUserInput } from './dtos/update-user.input'
+import { UpdateUserProfileImageInput } from './dtos/update-user-profile-image.input'
 
 @Resolver(() => User)
 export class UsersResolver {
@@ -24,7 +38,7 @@ export class UsersResolver {
   }
 
   @ResolveField(() => Boolean)
-  followedByMe(@Parent() user: User, @CurrentUser() currentUser?: User | null) {
+  followedByMe(@Parent() user: User, @CurrentUser() currentUser: User | null) {
     if (!currentUser) return false
     return this.followsService.getFollowedByMe(currentUser.id, user.id)
   }
@@ -41,5 +55,47 @@ export class UsersResolver {
     if (!user) throw new NotFoundException('User not found')
 
     return user
+  }
+
+  @Query(() => Boolean)
+  async isUsernameTaken(@Args('username') username: string) {
+    return this.usersService.isUsernameTaken(username)
+  }
+
+  @Query(() => Boolean)
+  async isEmailTaken(@Args('email') email: string) {
+    return this.usersService.isEmailTaken(email)
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Mutation(() => User)
+  async updateUser(
+    @Args('data') data: UpdateUserInput,
+    @CurrentUser() user: User | null,
+  ) {
+    if (!user) throw new UnauthorizedException('You are not logged in')
+
+    return await this.usersService.updateUser(data, user.id)
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Mutation(() => DeleteUserOutput)
+  async deleteUser(@CurrentUser() user: User | null) {
+    if (!user) throw new UnauthorizedException('You are not logged in')
+
+    await this.usersService.deleteUser(user.id)
+
+    return { success: true, message: 'User deleted' }
+  }
+
+  @UseGuards(OptionalJwtAuthGuard)
+  @Mutation(() => User)
+  async updateUserProfileImage(
+    @Args('data') data: UpdateUserProfileImageInput,
+    @CurrentUser() user: User | null,
+  ) {
+    if (!user) throw new UnauthorizedException('You are not logged in')
+
+    return await this.usersService.updateUserProfileImage(data, user.id)
   }
 }
