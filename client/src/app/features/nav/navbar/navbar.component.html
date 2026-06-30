@@ -4,7 +4,13 @@
   </div>
   <ng-container *ngIf="authStatus$ | async as status">
     <ng-container *ngIf="currentUser$ | async as currentUser">
-      <div class="profile" (click)="openMenu()" *ngIf="currentUser.imagePath">
+      <div
+        class="profile"
+        (click)="openMenu()"
+        (keydown.enter)="openMenu()"
+        *ngIf="currentUser.imagePath"
+        tabindex="0"
+      >
         <img [src]="currentUser.imagePath" default="profile" />
       </div>
     </ng-container>

@@ -5,7 +5,7 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
+  width: 100vw;
   height: 4em;
   top: 0;
   padding: 0.5em 1em;
@@ -27,19 +27,32 @@ nav {
     &:link {
       color: $accent-1;
     }
+
+    &:hover {
+      color: $accent-2;
+    }
+
+    &:focus-visible {
+      outline: 0.08em solid white;
+      outline-offset: 0.2em;
+      border-radius: 0.2em;
+    }
   }
 
   button {
     cursor: pointer;
-    background-color: $accent-1;
+    background-color: black;
+    color: $accent-1;
+    border: 0.15em solid $accent-1;
     outline: none;
-    border: none;
     font-weight: bold;
     padding: 0.5em 1em;
     border-radius: 5em;
 
-    &:hover {
-      background-color: $accent-2;
+    &:hover,
+    &:focus-visible {
+      background-color: $accent-1;
+      color: white;
     }
   }
 }
@@ -58,6 +71,11 @@ nav {
   cursor: pointer;
   border-radius: 100%;
   outline: 0.15em solid darkgrey;
+
+  &:focus-visible {
+    outline-color: white;
+    outline-offset: 0.2em;
+  }
 
   img {
     height: 100%;

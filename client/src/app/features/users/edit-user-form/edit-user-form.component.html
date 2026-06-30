@@ -24,17 +24,19 @@
     [formControl]="passwordControl"
     label="PASSWORD"
     placeholder="Password"
+    class="password"
   ></password-field>
   <password-field
     [formControl]="repeatPasswordControl"
     label="REPEAT PASSWORD"
     placeholder="Repeat Password"
+    class="repeat-password"
   ></password-field>
   <div class="errors">
     <print-error [control]="editForm.get('password')"></print-error>
   </div>
   <h4>Change E-mail</h4>
-  <div class="field">
+  <div class="field email">
     <label for="email">E-MAIL</label>
     <input
       type="text"
@@ -43,7 +45,7 @@
       placeholder="E-mail"
     />
   </div>
-  <div class="field">
+  <div class="field repeat-email">
     <label for="repeat-email">REPEAT E-MAIL</label>
     <input
       type="text"
@@ -66,7 +68,12 @@
   </div>
 </form>
 
-<modal-wrapper (close)="closeConfirmDelete()" *ngIf="showConfirmDelete">
+<modal-wrapper
+  (close)="closeConfirmDelete()"
+  *ngIf="showConfirmDelete"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+>
   <div class="delete-modal">
     <p>Are you sure you want to delete your account?</p>
     <div>

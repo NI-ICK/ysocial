@@ -25,6 +25,7 @@ import { LikedPostsComponent } from '../liked-posts/liked-posts.component'
 import { ModalWrapperComponent } from '../../../shared/modal-wrapper/modal-wrapper.component'
 import { EditUserFormComponent } from '../edit-user-form/edit-user-form.component'
 import { PenIconComponent } from '../../../shared/icons/pen-icon/pen-icon.component'
+import { A11yModule } from '@angular/cdk/a11y'
 
 type PostsState = 'created' | 'liked'
 
@@ -39,6 +40,7 @@ type PostsState = 'created' | 'liked'
     ModalWrapperComponent,
     EditUserFormComponent,
     PenIconComponent,
+    A11yModule,
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss',

@@ -1,5 +1,6 @@
 @use "colors" as *;
 @use "form-controls";
+@use "breakpoints" as *;
 
 .comment {
   position: relative;
@@ -78,6 +79,12 @@
     align-items: center;
     gap: 0.5em;
 
+    a:focus-visible {
+      outline: 0.15em solid white;
+      border-radius: 0.2em;
+      outline-offset: 0.2em;
+    }
+
     p {
       font-size: 0.8em;
       font-weight: bold;
@@ -112,49 +119,68 @@
     padding: 0.5em 1em;
     border-radius: 0.5em;
     background-color: black;
+    border: 0.15em solid white;
     color: white;
     margin-left: 0.5em;
 
-    &:hover {
-      background-color: $accent-1;
+    &:hover,
+    &:focus-visible {
+      background-color: white;
+      color: black;
     }
   }
 }
 
 .show-replies {
-  margin-top: 1em;
-  text-align: center;
-  position: relative;
-  font-size: 0.8em;
-  font-weight: bold;
-  color: grey;
-  cursor: pointer;
+  outline: none;
 
-  &::before,
-  &::after {
-    position: absolute;
-    content: "";
-    background-color: $border;
-    width: calc(35% - 12ch);
-    height: 0.1em;
-    top: 50%;
-    transform: translateY(-50%);
+  &:focus-visible {
+    p {
+      color: white;
+
+      &::before,
+      &::after {
+        background-color: white;
+      }
+    }
   }
 
-  &::before {
-    left: 8em;
-  }
-
-  &::after {
-    right: 8em;
-  }
-
-  &:hover {
-    color: white;
+  p {
+    margin-top: 1em;
+    text-align: center;
+    position: relative;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: grey;
+    cursor: pointer;
 
     &::before,
     &::after {
-      background-color: white;
+      position: absolute;
+      content: "";
+      background-color: $border;
+      width: calc(35% - 12ch);
+      height: 0.1em;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    &::before {
+      left: 8em;
+    }
+
+    &::after {
+      right: 8em;
+    }
+
+    &:hover,
+    &:focus-visible {
+      color: white;
+
+      &::before,
+      &::after {
+        background-color: white;
+      }
     }
   }
 }
@@ -169,6 +195,10 @@ form {
   padding-inline: 6em;
   width: 100%;
 
+  @include xs {
+    padding-inline: 1em;
+  }
+
   .field {
     margin-left: 0;
     padding: 0;
@@ -181,11 +211,15 @@ form {
     gap: 1em;
 
     button:nth-of-type(1) {
-      background-color: $border;
+      background-color: black;
+      border: 0.1em solid white;
       color: white;
 
-      &:hover {
-        background-color: #333333;
+      &:hover,
+      &:focus-visible {
+        background-color: white;
+        border: 0.1em solid black;
+        color: black;
       }
     }
   }
@@ -211,6 +245,7 @@ form {
   width: 1em;
   border-radius: 1em;
   height: calc(100% - 5em);
+  outline: none;
 
   .bar {
     background-color: $border;
@@ -218,7 +253,8 @@ form {
     width: 0.2em;
   }
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     .bar {
       background-color: white;
     }

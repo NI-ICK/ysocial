@@ -6,6 +6,7 @@
           [src]="post.user.imagePath"
           default="profile"
           [routerLink]="['/', post.user.username]"
+          tabindex="-1"
         />
         <a [routerLink]="['/', post.user.username]">{{ post.user.username }}</a>
         <p>• {{ timeAgo(post.createdAt) }}</p>
@@ -14,11 +15,21 @@
         <span
           *ngIf="currentUser?.id === post.user.id"
           (click)="$event.stopPropagation(); showOptions()"
+          (keydown.enter)="$event.stopPropagation(); showOptions()"
+          tabindex="0"
         ></span>
       </ng-container>
       <div *ngIf="optionsVisible" class="menu" (clickOutside)="closeOptions()">
-        <p (click)="showEdit()">Edit Post</p>
-        <p (click)="showConfirmation()">Delete Post</p>
+        <p (click)="showEdit()" (keydown.enter)="showEdit()" tabindex="0">
+          Edit Post
+        </p>
+        <p
+          (click)="showConfirmation()"
+          (keyup.enter)="showConfirmation()"
+          tabindex="0"
+        >
+          Delete Post
+        </p>
       </div>
     </div>
     <div class="content">
@@ -40,6 +51,8 @@
         <like-icon
           [isLiked]="post.likedByMe"
           (click)="toggleLike()"
+          (keydown.enter)="toggleLike()"
+          tabindex="0"
         ></like-icon>
         <p>{{ post.likesCount }}</p>
       </div>
@@ -64,7 +77,12 @@
   </div>
 </div>
 
-<modal-wrapper *ngIf="editVisible" (close)="closeEdit()">
+<modal-wrapper
+  *ngIf="editVisible"
+  (close)="closeEdit()"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+>
   <form [formGroup]="editForm" (ngSubmit)="editPost()">
     <h2>Edit post</h2>
     <div class="field">
@@ -74,7 +92,12 @@
   </form>
 </modal-wrapper>
 
-<modal-wrapper *ngIf="confirmationVisible" (close)="closeConfirmation()">
+<modal-wrapper
+  *ngIf="confirmationVisible"
+  (close)="closeConfirmation()"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+>
   <div class="confirmation">
     <p>Do you really want to delete this post?</p>
     <div>

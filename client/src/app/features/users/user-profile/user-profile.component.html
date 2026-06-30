@@ -10,6 +10,7 @@
           <img [src]="userProfile.imagePath" />
           <ng-container *ngIf="currentUser$ | async as currentUser">
             <div
+              *ngIf="userProfile.id === currentUser.id"
               class="icon {{ profileImgHovered ? 'hovered' : '' }}"
               (click)="handleChooseFile()"
             >
@@ -84,6 +85,11 @@
     ></liked-posts>
   </div>
 </div>
-<modal-wrapper *ngIf="showEditModal" (close)="closeEditModal()">
+<modal-wrapper
+  *ngIf="showEditModal"
+  (close)="closeEditModal()"
+  cdkTrapFocus
+  cdkTrapFocusAutoCapture
+>
   <edit-user-form (submitSuccess)="closeEditModal()"></edit-user-form>
 </modal-wrapper>

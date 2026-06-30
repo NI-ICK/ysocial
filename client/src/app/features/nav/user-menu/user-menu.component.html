@@ -1,4 +1,8 @@
 <div class="content" *ngIf="currentUser$ | async as currentUser">
-  <a [routerLink]="['/', currentUser.username]">Profile</a>
-  <p (click)="logoutUser()">Sign out</p>
+  <a [routerLink]="['/', currentUser.username]" (click)="this.closeMenu.emit()"
+    >Profile</a
+  >
+  <p (click)="logoutUser()" (keydown.enter)="logoutUser()" tabindex="0">
+    Sign out
+  </p>
 </div>

@@ -19,8 +19,10 @@
       />
       <div class="wrapper">
         <span
+          tabindex="0"
           class="icon"
           (click)="handleChooseFile()"
+          (keydown.enter)="handleChooseFile()"
           (mouseenter)="imageIconHovered = true"
           (mouseleave)="imageIconHovered = false"
         >
@@ -32,6 +34,8 @@
           *ngIf="selectedFile"
           class="remove"
           (click)="handleRemoveFile()"
+          (keydown.enter)="handleRemoveFile()"
+          tabindex="0"
         ></span>
         <button type="submit">Post</button>
       </div>

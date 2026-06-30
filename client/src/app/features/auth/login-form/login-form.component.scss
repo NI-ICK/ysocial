@@ -11,10 +11,19 @@
   display: flex;
   align-items: center;
 
+  &:focus-visible {
+    outline: 0.15em solid white;
+    outline-offset: 0.2em;
+  }
+
   p {
     flex: 1;
     text-align: center;
   }
+}
+
+form {
+  width: 25em;
 }
 
 .separator {
@@ -55,6 +64,13 @@
 
     &:hover {
       color: $accent-2;
+    }
+
+    &:focus-visible {
+      color: $accent-2;
+      outline: 0.15em solid white;
+      outline-offset: 0.2em;
+      border-radius: 0.2em;
     }
   }
 }

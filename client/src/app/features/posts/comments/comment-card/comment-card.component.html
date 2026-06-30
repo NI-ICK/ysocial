@@ -1,6 +1,10 @@
 <div class="comment">
   <div class="container">
-    <div class="profile" [routerLink]="['/', comment.user.username]">
+    <div
+      class="profile"
+      [routerLink]="['/', comment.user.username]"
+      tabindex="-1"
+    >
       <img [src]="comment.user.imagePath" default="profile" />
     </div>
     <div class="content">
@@ -22,6 +26,8 @@
           <like-icon
             [isLiked]="comment.likedByMe"
             (click)="toggleLike()"
+            (keydown.enter)="toggleLike()"
+            tabindex="0"
           ></like-icon>
           <p>{{ comment.likesCount }}</p>
         </div>
@@ -45,17 +51,17 @@
       <button type="submit">Post</button>
     </div>
   </form>
-  <div (click)="expandReplies()">
-    <p
-      *ngIf="comment.repliesCount === 1 && !areRepliesExpanded()"
-      class="show-replies"
-    >
+  <div
+    *ngIf="comment.repliesCount"
+    (click)="expandReplies()"
+    (keydown.enter)="expandReplies()"
+    tabindex="0"
+    class="show-replies"
+  >
+    <p *ngIf="comment.repliesCount === 1 && !areRepliesExpanded()">
       Show 1 reply
     </p>
-    <p
-      *ngIf="comment.repliesCount > 1 && !areRepliesExpanded()"
-      class="show-replies"
-    >
+    <p *ngIf="comment.repliesCount > 1 && !areRepliesExpanded()">
       Show {{ comment.repliesCount }} replies
     </p>
   </div>
@@ -68,6 +74,8 @@
     class="reply-bar"
     *ngIf="areRepliesExpanded()"
     (click)="collapseReplies()"
+    (keydown.enter)="collapseReplies()"
+    tabindex="0"
   >
     <div class="bar"></div>
   </div>

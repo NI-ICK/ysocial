@@ -37,8 +37,10 @@
     width: 2.5em;
     height: 2.5em;
     cursor: pointer;
+    outline: none;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       color: $danger;
     }
 
@@ -85,6 +87,10 @@
   justify-content: center;
   border-radius: 100%;
   cursor: pointer;
+
+  &:focus-visible {
+    outline: 0.15em solid white;
+  }
 }
 
 .profile {

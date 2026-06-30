@@ -37,8 +37,8 @@ describe('CommentCardComponent', () => {
       '2': mockReply2,
     },
     postComments: {},
-    loadingRootComments: {},
-    loadingReplies: {},
+    loadingRootComments: false,
+    loadingReplies: false,
     likingComment: {},
     error: null,
   }

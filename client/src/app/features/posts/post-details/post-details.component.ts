@@ -46,7 +46,7 @@ import {
 } from '../../../store/comments/comments.selectors'
 import { Comment } from '../../../utils/interfaces/comment.interface'
 import { LoadingComponent } from '../../../shared/loading/loading.component'
-
+import { A11yModule } from '@angular/cdk/a11y'
 @Component({
   selector: 'post-details',
   imports: [
@@ -62,6 +62,7 @@ import { LoadingComponent } from '../../../shared/loading/loading.component'
     CommentCardComponent,
     CreateCommentFormComponent,
     LoadingComponent,
+    A11yModule,
   ],
   templateUrl: './post-details.component.html',
   styleUrl: './post-details.component.scss',
@@ -142,6 +143,8 @@ export class PostDetailsComponent implements OnInit, OnDestroy {
 
   showConfirmation = () => (this.confirmationVisible = true)
   closeConfirmation = () => (this.confirmationVisible = false)
+
+  test = () => console.log('qwe')
 
   showEdit = () => (this.editVisible = true)
   closeEdit = () => (this.editVisible = false)

@@ -1,10 +1,20 @@
 <form [formGroup]="loginForm" (ngSubmit)="handleFormSubmit()">
   <h2>Sign In</h2>
-  <div class="container" (click)="handleGoogleLogin()">
+  <div
+    class="container"
+    (click)="handleGoogleLogin()"
+    (keydown.enter)="handleGoogleLogin()"
+    tabindex="0"
+  >
     <google-icon></google-icon>
     <p>Continue with Google</p>
   </div>
-  <div class="container" (click)="handleGithubLogin()">
+  <div
+    class="container"
+    (click)="handleGithubLogin()"
+    (keydown.enter)="handleGithubLogin()"
+    tabindex="0"
+  >
     <github-icon></github-icon>
     <p>Continue with Github</p>
   </div>
@@ -28,6 +38,11 @@
   <button type="submit">Sign In</button>
   <p class="message">
     Don't have an account?
-    <span (click)="openRegisterModal.emit()">Sign Up</span>
+    <span
+      (click)="openRegisterModal.emit()"
+      (keydown.enter)="openRegisterModal.emit()"
+      tabindex="0"
+      >Sign Up</span
+    >
   </p>
 </form>

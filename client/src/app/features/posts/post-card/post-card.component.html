@@ -1,14 +1,17 @@
 <div
+  #postCard
   *ngIf="post"
   class="post"
   [routerLink]="
     post.id.startsWith('tmp-') ? null : ['/', post.user.username, post.id]
   "
+  (keydown.enter)="postCard.click()"
 >
   <div
     class="profile"
     [routerLink]="['/', post.user.username]"
     (click)="$event.stopPropagation()"
+    tabindex="-1"
   >
     <img [src]="post.user.imagePath" default="profile" />
   </div>
@@ -26,7 +29,9 @@
       <span
         *ngIf="(post.body ?? '').length > 200"
         (click)="handleExpand(); $event.stopPropagation()"
+        (keydown.enter)="handleExpand(); $event.stopPropagation()"
         class="expand-body"
+        tabindex="0"
       >
         {{ isExpanded() ? "" : "Read more..." }}
       </span>
@@ -42,6 +47,8 @@
         <like-icon
           [isLiked]="post.likedByMe"
           (click)="toggleLike()"
+          (keydown.enter)="toggleLike(); $event.stopPropagation()"
+          tabindex="0"
         ></like-icon>
         <p>{{ post.likesCount }}</p>
       </div>

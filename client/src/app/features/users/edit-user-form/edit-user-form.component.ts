@@ -25,6 +25,7 @@ import { PrintErrorComponent } from '../../../shared/print-error/print-error.com
 import { NgIf } from '@angular/common'
 import { ModalWrapperComponent } from '../../../shared/modal-wrapper/modal-wrapper.component'
 import { PopupService } from '../../../shared/popup/popup.service'
+import { A11yModule } from '@angular/cdk/a11y'
 
 @Component({
   selector: 'edit-user-form',
@@ -34,6 +35,7 @@ import { PopupService } from '../../../shared/popup/popup.service'
     PrintErrorComponent,
     NgIf,
     ModalWrapperComponent,
+    A11yModule,
   ],
   templateUrl: './edit-user-form.component.html',
   styleUrl: './edit-user-form.component.scss',

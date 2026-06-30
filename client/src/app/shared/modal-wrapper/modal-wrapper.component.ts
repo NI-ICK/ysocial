@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core'
+import { Component, Output, EventEmitter, HostListener } from '@angular/core'
 
 @Component({
   selector: 'modal-wrapper',
@@ -9,6 +9,7 @@ import { Component, Output, EventEmitter } from '@angular/core'
 export class ModalWrapperComponent {
   @Output() close = new EventEmitter()
 
+  @HostListener('document:keydown.escape')
   closeModal() {
     this.close.emit()
   }

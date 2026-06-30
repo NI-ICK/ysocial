@@ -66,6 +66,12 @@
         color: $accent-1;
       }
 
+      &:focus-visible {
+        outline: 0.15em solid white;
+        outline-offset: 0.2em;
+        border-radius: 0.2em;
+      }
+
       &:hover {
         color: $accent-2;
 

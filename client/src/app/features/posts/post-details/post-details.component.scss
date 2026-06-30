@@ -1,4 +1,5 @@
 @use "colors" as *;
+@use "breakpoints" as *;
 @use "_form-controls.scss";
 
 .container {
@@ -39,6 +40,12 @@
       margin-left: 1em;
       text-decoration: none;
 
+      &:focus-visible {
+        outline: 0.15em solid white;
+        border-radius: 0.2em;
+        outline-offset: 0.2em;
+      }
+
       &:hover {
         color: $accent-2;
 
@@ -76,6 +83,10 @@
       background-color: $hover;
     }
 
+    &:focus-visible {
+      outline: 0.15em solid white;
+    }
+
     &::after {
       position: absolute;
       left: 50%;
@@ -98,17 +109,29 @@
   border-radius: 0.5em;
   padding: 0.5em;
 
+  @include md {
+    right: 0;
+  }
+
   p {
     border-radius: 0.5em;
     padding: 0.5em;
     cursor: pointer;
+    border: 0.15em solid transparent;
+    outline: none;
 
-    &:hover {
-      background-color: $hover;
+    &:hover,
+    &:focus-visible {
+      border-color: white;
     }
 
     &:last-of-type {
       color: $danger;
+
+      &:hover,
+      &:focus-visible {
+        border-color: $danger;
+      }
     }
   }
 }
@@ -161,46 +184,68 @@
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  text-align: center;
   background-color: black;
   padding: 1em;
   border-radius: 0.5em;
   font-size: 1.5em;
   box-shadow: -0.5em 0.5em 1em -0.2em black;
+  width: 80vw;
+  max-width: 25em;
 
   p {
     margin-bottom: 1em;
+  }
+
+  div {
+    display: flex;
   }
 
   button {
     cursor: pointer;
     padding: 0.5em 1em;
     border: none;
-    background-color: $background-1;
     margin-inline: 2em;
     border-radius: 0.5em;
     font-size: 0.7em;
-
-    &:hover {
-      background-color: $hover;
-    }
+    outline: none;
   }
 
   button:nth-of-type(1) {
     color: white;
+    background-color: black;
+    border: 0.15em solid white;
+
+    &:hover,
+    &:focus-visible {
+      background-color: white;
+      color: black;
+    }
   }
 
   button:nth-of-type(2) {
     color: $danger;
+    border: 0.15em solid $danger;
+    background-color: black;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $danger;
+      color: white;
+    }
   }
 }
 
 textarea {
+  min-height: 4.2em;
   resize: none;
   overflow: hidden;
 }
 
 form {
   font-size: 1.2em;
+  max-width: 30em;
+  width: 80vw;
 }
 
 .info {
